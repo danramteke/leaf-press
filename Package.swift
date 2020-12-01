@@ -19,7 +19,8 @@ let package = Package(
   targets: [      
     .target(name: "leaf-press", 
             dependencies: [
-              .product(name: "ConsoleKit", package: "console-kit")
+              .product(name: "ConsoleKit", package: "console-kit"),
+              .target(name: "LeafPressKit")
             ]),
     .target(name: "LeafPressKit", 
             dependencies: [
