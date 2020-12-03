@@ -8,4 +8,8 @@ public struct Post {
   public let summary: String
   
   public let published: DateString
+
+  public let source: FileLocation
+  public let target: FileLocation
+  public let relativeUrl: URL
 }

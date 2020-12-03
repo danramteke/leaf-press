@@ -3,9 +3,16 @@ import PathKit
 
 enum PublishType {
   case page, post
+
+  var templateName: String {
+    switch self {
+    case .page: return "page.leaf"
+    case .post: return "post.leaf"
+    }
+  }
 }
 
-struct FileLocation: Hashable {
+public struct FileLocation: Hashable {
   let root: String
   let relativePath: String // relative path from root to file
   let slug: String // filename without extensions

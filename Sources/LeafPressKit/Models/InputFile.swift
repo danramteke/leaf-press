@@ -2,8 +2,20 @@ import Foundation
 import PathKit
 import NIO
 
-struct InputFile {
+struct ContentInputFile {
+  let content: String
 
+  init(string: String) {
+    let lines = string.components(separatedBy: "\n")
+    if let idx = lines.firstIndex(of: "---") {
+      self.content = lines[idx...].joined(separator: "\n")
+    } else {
+      self.content = string
+    }
+  }
+}
+
+struct InputFile {
   //  let rawValue: String
   let frontMatter: [String: String]
   let source: FileLocation

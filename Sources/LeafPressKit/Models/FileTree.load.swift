@@ -11,12 +11,5 @@ extension FileTree {
         return InputFile(buffer: buffer, at: location)
       }
     }
-
-
-//    .map { (pairs) in
-//      Dictionary(uniqueKeysWithValues: pairs(
-//    }
-
-
   }
 }
