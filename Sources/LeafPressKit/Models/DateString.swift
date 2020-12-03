@@ -17,3 +17,9 @@ struct DateString: RawRepresentable {
 //    return c
 //  }
 }
+
+extension String {
+  var dateString: DateString {
+    DateString(rawValue: self)
+  }
+}

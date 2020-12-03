@@ -58,6 +58,13 @@ final class BuildCommand: Command {
     if signature.ignoreStatic {
       context.console.output("Skipping static files".consoleText(.info))
     }
-    BuildAction(config: config).build(ignoreStatic: signature.ignoreStatic)
+
+    let result = BuildAction(config: config).build(ignoreStatic: signature.ignoreStatic)
+    switch result {
+    case .failure(let error):
+      context.console.output("\(error)".consoleText(.error))
+    case .success:
+      context.console.output("Done".consoleText(.success))
+    }
   }
 }

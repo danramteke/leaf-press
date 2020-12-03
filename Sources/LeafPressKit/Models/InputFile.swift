@@ -1,74 +1,37 @@
 import Foundation
 import PathKit
+import NIO
 
 struct InputFile {
-  let rawValue: String
 
+//  let rawValue: String
+  let frontMatter: [String: String]
   let source: FileLocation
   let target: FileLocation
-  let published: DateString
-  let summary: String
-  let root: String
 
-
-}
-
-struct FileLocation: Hashable {
-  let relativePath: String // relative path from root to file
-  let slug: String // filename without extensions
-  let fileType: FileType
-
-  init(relativePath: String, slug: String, fileType: FileType) {
-    self.relativePath = relativePath
-    self.slug = slug
-    self.fileType = fileType
+  var fileType: FileType {
+    source.fileType
   }
 
-  init?(path: Path, root: Path) {
-    let filename = path.lastComponent
-
-
-    guard let fileType = FileType(filename: filename) else {
-      return nil
-    }
-
-    let slug = filename.removing(suffix: fileType.rawValue)!
-    let relativePath = path.relative(to: root).string
-
-    self.init(relativePath: relativePath,
-              slug: slug,
-              fileType: fileType)
+  var slug: String {
+    source.slug
   }
-}
-
-enum FileType: String, CaseIterable, Equatable, Hashable {
-  case mdLeaf = ".md.leaf"
-  case md = ".md", leaf = ".leaf", html = ".html"
-
-  static let glob: String = "*.{md,html,leaf}"
   
-  init?(filename: String) {
-    let maybeFileType = FileType.allCases.first(where: { fileType in
-      filename.hasSuffix(fileType.rawValue)
-    })
-
-    guard let fileType = maybeFileType else {
-      return nil
-    }
-    self = fileType
+  var summary: String? {
+    frontMatter["summary"]
   }
 
+  var published: DateString? {
+    frontMatter["published"]?.dateString
+  }
+
+  var publishType: PublishType {
+    source.publishType
+  }
 }
 
-
-extension String {
-  public func removing(suffix: String) -> String? {
-    guard self.hasSuffix(suffix) else { return nil }
-    if let range = self.range(of: suffix) {
-      let slice = self[..<range.lowerBound]
-      return String(slice)
-    } else {
-      return nil
-    }
+extension InputFile {
+  init(buffer: ByteBuffer) {
+ fatalError()
   }
 }
