@@ -1,8 +1,8 @@
 import Foundation
 import NIO
 
-extension Page: InputFileInitable {
-  init?(inputFile: InputFile) {
+extension Page {
+  init?(config: Config, inputFile: InputFile) {
     return nil
   }
 }

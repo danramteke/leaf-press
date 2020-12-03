@@ -1,8 +1,8 @@
 import NIO
 import Foundation
 
-extension Post: InputFileInitable {
-  init?(inputFile: InputFile) {
+extension Post {
+  init?(config: Config, inputFile: InputFile) {
     return nil
   }
 }

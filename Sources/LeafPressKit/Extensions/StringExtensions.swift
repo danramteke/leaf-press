@@ -12,3 +12,9 @@ extension String {
     }
   }
 }
+
+extension Substring {
+  var string: String {
+    String(self)
+  }
+}

@@ -7,7 +7,6 @@ struct InputFile {
   //  let rawValue: String
   let frontMatter: [String: String]
   let source: FileLocation
-  let target: FileLocation
 
   var fileType: FileType {
     source.fileType
@@ -38,19 +37,19 @@ extension InputFile {
       let frontMatter = Dictionary<String, String>(uniqueKeysWithValues:
                                                     lines[lines.startIndex..<idx]
                                                     .compactMap { frontMatterLine in
-                                                      if let colonIndex = frontMatterLine.firstIndex(of: ":") {
-                                                        let key = frontMatterLine[..<colonIndex]
-                                                        let val = frontMatterLine[frontMatterLine.index(colonIndex, offsetBy: 1)...]
-                                                        return (String(key), val.trimmingCharacters(in: .whitespaces))
-                                                      } else {
+                                                      guard let colonIndex = frontMatterLine.firstIndex(of: ":") else {
                                                         return nil
                                                       }
+                                                      let key = frontMatterLine[..<colonIndex].string
+                                                      let val = frontMatterLine[frontMatterLine.index(colonIndex, offsetBy: 1)...]
+                                                        .trimmingCharacters(in: .whitespaces)
+
+                                                      return (key, val)
                                                     })
 
-      print(frontMatter)
-      self.init(frontMatter: frontMatter, source: fileLocation, target: fileLocation)
+      self.init(frontMatter: frontMatter, source: fileLocation)
     } else {
-      self.init(frontMatter: [:], source: fileLocation, target: fileLocation)
+      self.init(frontMatter: [:], source: fileLocation)
     }
 
   }
@@ -59,6 +58,3 @@ extension InputFile {
   }
 }
 
-protocol InputFileInitable {
-  init?(inputFile: InputFile)
-}
