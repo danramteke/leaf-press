@@ -1,10 +1,14 @@
 import Foundation
 
-struct DateString: RawRepresentable {
-  let rawValue: String
+public struct DateString: RawRepresentable {
+  public let rawValue: String
 
-  var date: Date? {
+  public var date: Date? {
     return nil
+  }
+
+  public init(rawValue: String) {
+    self.rawValue = rawValue
   }
 
 //  var dateComponents: DateComponents {

@@ -35,3 +35,7 @@ extension InputFile {
  fatalError()
   }
 }
+
+protocol InputFileInitable {
+  init?(inputFile: InputFile)
+}
