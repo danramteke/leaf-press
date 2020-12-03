@@ -16,8 +16,6 @@ struct InputFile {
 struct FileLocation {
   let relativePath: String // relative path from root to file
   let slug: String // filename without extensions
-
-
   let fileType: FileType
 
   init(relativePath: String, slug: String, fileType: FileType) {

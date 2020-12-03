@@ -52,8 +52,6 @@ final class BuildCommand: Command {
       }
     }()
 
-
-    context.console.output(String(describing: config).consoleText())
     BuildAction(config: config).build()
   }
 }
