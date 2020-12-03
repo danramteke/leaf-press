@@ -1,5 +1,6 @@
 import Foundation
 import PathKit
+import NIO
 
 class FileTree {
   let fileLocations: [FileLocation]
@@ -8,4 +9,8 @@ class FileTree {
         FileLocation(path: childPath.absolute(), root: root)
     }
   }
+
+//  func buildInternalRepresentation() -> EventLoopFuture<Void> {
+//    return .
+//  }
 }

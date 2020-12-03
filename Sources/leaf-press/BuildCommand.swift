@@ -13,6 +13,9 @@ final class BuildCommand: Command {
     @Option(name: "work-dir", short: "w", help: "Custom workspace dir. Defaults to the directory of the config file")
     var workDir: String?
 
+    @Flag(name: "ignore-static", help: "Don't copy static files")
+    var ignoreStatic: Bool
+
     init() { }
   }
 
@@ -52,6 +55,9 @@ final class BuildCommand: Command {
       }
     }()
 
-    BuildAction(config: config).build()
+    if signature.ignoreStatic {
+      context.console.output("Skipping static files".consoleText(.info))
+    }
+    BuildAction(config: config).build(ignoreStatic: signature.ignoreStatic)
   }
 }

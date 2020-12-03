@@ -5,15 +5,13 @@ extension Config {
 
   static let defaultPath = "./leaf-press.yml"  
 
-
-
-  public struct Cli: Codable {
-    public let distDir: String?
-    public let pagesDir: String?
-    public let postsDir: String?
-    public let staticFilesDir: String?
-    public let templatesDir: String?
-    public init(distDir: String,
+  struct Cli: Codable {
+    let distDir: String?
+    let pagesDir: String?
+    let postsDir: String?
+    let staticFilesDir: String?
+    let templatesDir: String?
+    init(distDir: String,
                 pagesDir: String,
                 postsDir: String,
                 staticFilesDir: String,

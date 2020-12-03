@@ -13,7 +13,7 @@ struct InputFile {
 
 }
 
-struct FileLocation {
+struct FileLocation: Hashable {
   let relativePath: String // relative path from root to file
   let slug: String // filename without extensions
   let fileType: FileType
@@ -41,7 +41,7 @@ struct FileLocation {
   }
 }
 
-enum FileType: String, CaseIterable {
+enum FileType: String, CaseIterable, Equatable, Hashable {
   case mdLeaf = ".md.leaf"
   case md = ".md", leaf = ".leaf", html = ".html"
 
