@@ -8,7 +8,7 @@ extension FileTree {
 
     return self.fileLocations.map { (location) -> EventLoopFuture<InputFile> in
       location.read(with: io, on: eventLoop).map { (buffer) -> InputFile in
-        return InputFile(buffer: buffer)
+        return InputFile(buffer: buffer, at: location)
       }
     }
 

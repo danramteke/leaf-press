@@ -1,5 +1,6 @@
 import Foundation
 import PathKit
+
 enum PublishType {
   case page, post
 }
@@ -39,12 +40,9 @@ struct FileLocation: Hashable {
   }
 
   var absolutePath: Path {
-    return Path(root) + Path(relativePath) + Path(slug + fileType.rawValue)
+    Path(root) + Path(relativePath)
   }
-
-
 }
-
 
 
 enum FileType: String, CaseIterable, Equatable, Hashable {
