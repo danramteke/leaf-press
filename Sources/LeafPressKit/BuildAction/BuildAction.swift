@@ -9,6 +9,12 @@ public class BuildAction {
 
   public func build(ignoreStatic: Bool) -> Result<Void, Error> {
 
+    do {
+      try config.distDir.mkpath()
+    } catch {
+      return .failure(error)
+    }
+
     if !ignoreStatic {
       let copyStaticResult = CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
       switch copyStaticResult {
@@ -69,9 +75,12 @@ public class BuildAction {
     let renderer = Renderer(config: config)
 
     let flag = futurePages.and(futurePosts).flatMap { (pages, posts ) -> EventLoopFuture<Void> in
-      let website = Website(pages: pages, posts: posts)
 
-      return renderer.render(website: website, in: threadPool, on: eventLoop)
+      let website = Website(pages: pages,
+                            posts: posts)
+      return renderer.render(website: website,
+                             in: threadPool,
+                             on: eventLoop)
     }
 
 

@@ -36,6 +36,10 @@ struct InputFile {
     frontMatter["published"]?.dateString
   }
 
+  var title: String? {
+    frontMatter["title"]
+  }
+
   var publishType: PublishType {
     source.publishType
   }
