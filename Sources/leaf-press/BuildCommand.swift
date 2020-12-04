@@ -7,10 +7,10 @@ import Foundation
 final class BuildCommand: Command {
   struct Signature: CommandSignature, ConfigLoading {
 
-    @Option(name: "config", short: "c", help: "Custom config file. Default: \(Config.defaultPath)")
+    @Option(name: Strings.config.name, short: Strings.config.short, help: Strings.config.help)
     var configFilePath: String?
 
-    @Option(name: "work-dir", short: "w", help: "Custom workspace dir. Defaults to the directory of the config file")
+    @Option(name: Strings.workDir.name, short: Strings.workDir.short, help: Strings.workDir.help)
     var workDir: String?
 
     @Flag(name: "ignore-static", help: "Don't copy static files")

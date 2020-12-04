@@ -5,7 +5,7 @@ func go() {
 
   let console: Console = Terminal()
   let input = CommandInput(arguments: CommandLine.arguments)
-  let context = CommandContext(console: console, input: input)
+//  let context = CommandContext(console: console, input: input)
 
   var commands = Commands(enableAutocomplete: true)
 

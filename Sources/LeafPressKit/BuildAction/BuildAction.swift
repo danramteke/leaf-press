@@ -24,6 +24,32 @@ public class BuildAction {
       }
   }
 
+  private func doBuild2() -> Result<Void, Error> {
+    let pagesTree = FileTree(root: self.config.pagesDir)
+    let postsTree = FileTree(root: self.config.postsDir)
+
+    let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 3)
+    let threadPool = NIOThreadPool(numberOfThreads: 3)
+    threadPool.start()
+
+    let renderer = Renderer(config: config)
+    let flag: EventLoopFuture<Void> = InternalRepresentationLoader(config: config)
+      .load(pagesTree: pagesTree, postsTree: postsTree, threadPool: threadPool, eventLoopGroup: eventLoopGroup)
+      .flatMap { (website)  in
+        return renderer.render(website: website,
+                               in: threadPool,
+                               on: eventLoopGroup.next()).map { _ in
+                                return ()
+                               }
+      }
+
+    return Result<Void, Error> {
+      try flag.wait()
+      try eventLoopGroup.syncShutdownGracefully()
+      try threadPool.syncShutdownGracefully()
+    }
+  }
+
   private func doBuild() -> Result<Void, Error> {
 
     let pagesTree = FileTree(root: self.config.pagesDir)
