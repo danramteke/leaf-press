@@ -1,7 +1,7 @@
 import Foundation
 import PathKit
 
-public struct Post {
+public struct Post: Codable, Renderable {
   public typealias Id = Tagged<Post, String>
   public let slug: Id
   public let title: String

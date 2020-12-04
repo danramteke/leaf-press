@@ -2,14 +2,14 @@ import Foundation
 import NIO
 import LeafKit
 import PathKit
+import Down
 
 class Renderer {
   let config: Config
-
-  
   init(config: Config) {
     self.config = config
   }
+
   func render(website: Website, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<Void> {
     let io = NonBlockingFileIO(threadPool: threadPool)
 
@@ -22,54 +22,62 @@ class Renderer {
       eventLoop: eventLoop
     )
 
-    let futures: [EventLoopFuture<Void>] = website.pages.map { (page) -> EventLoopFuture<Void> in
-      page.source.read(with: io, on: eventLoop).flatMap { (buffer) -> EventLoopFuture<Void> in
+    let pageFutures: [EventLoopFuture<Void>] = self.render(renderables: website.pages, leafRenderer: leafRenderer, website: website, with: io, on: eventLoop)
+    let postFutures: [EventLoopFuture<Void>] = self.render(renderables: website.posts, leafRenderer: leafRenderer, website: website, with: io, on: eventLoop)
 
-        let context = page.leafData
-        let content = ContentInputFile(string: String(buffer: buffer)).content
-        switch page.source.fileType {
-        case .html:
-          break
-        case .leaf:
-          break
-        case .md:
-          leafRenderer.render(path: page.source.publishType.templateName, context: ["website": website.leafData])
-        case .mdLeaf:
-          break
-        }
 
-        return eventLoop.makeSucceededFuture(())
-      }
-    }
-    return EventLoopFuture<Void>.whenAllComplete(futures, on: eventLoop).flatMap { (results) -> EventLoopFuture<Void> in
+    return EventLoopFuture<Void>.whenAllComplete(pageFutures + postFutures, on: eventLoop).flatMap { (results) -> EventLoopFuture<Void> in
       return eventLoop.makeSucceededFuture(())
     }
   }
 
-  private func context(page: Page, website: Website) -> [String: LeafData] {
-    return ["page":page.leafData, "website": website.leafData]
-  }
-}
-
-class InMemoryLeafSource: LeafSource {
-  var memory: [String: String] = .init()
-  func file(template: String, escape: Bool, on eventLoop: EventLoop) throws -> EventLoopFuture<ByteBuffer> {
-    if let string = memory[template] {
-      return eventLoop.makeSucceededFuture(ByteBuffer(string: string))
-    } else {
-      return eventLoop.makeFailedFuture(NotFoundError())
+  private func render(renderables: [Renderable], leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoop: EventLoop) -> [EventLoopFuture<Void>] {
+    return renderables.map { (r) -> EventLoopFuture<Void> in
+      return self.render(renderable: r, leafRenderer: leafRenderer, website: website, with: io, on: eventLoop)
     }
   }
 
-  struct NotFoundError: Error {
+  private func render(renderable: Renderable, leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoop: EventLoop) -> EventLoopFuture<Void> {
+    renderable.source.read(with: io, on: eventLoop).flatMap { (buffer) -> EventLoopFuture<Void> in
+      let content = ContentInputFile(string: String(buffer: buffer)).content
 
-  }
 
-  func register(content: String, at path: String) {
+      switch renderable.source.fileType {
+      case .html:
+        let context = [
+          "current": renderable.leafData,
+          "website": website.leafData,
+          "content": content.leafData
+        ]
+        return leafRenderer
+          .render(path: renderable.source.publishType.templateName, context: context)
+          .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+            return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoop)
+          }
 
-  }
+      case .leaf:
+        return eventLoop.makeSucceededFuture(())
 
-  func removeContent(at path: String) {
+      case .md:
+        do {
+        let downContent = try Down(markdownString: content).toHTML(.unsafe)
+        let context = [
+          "current": renderable.leafData,
+          "website": website.leafData,
+          "content": downContent.leafData
+        ]
+        return leafRenderer
+          .render(path: renderable.source.publishType.templateName, context: context)
+          .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+            return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoop)
+          }
+        } catch {
+          return eventLoop.makeFailedFuture(error)
+        }
 
+      case .mdLeaf:
+        return eventLoop.makeSucceededFuture(())
+      }
+    }
   }
 }

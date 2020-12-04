@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DateString: RawRepresentable {
+public struct DateString: RawRepresentable, Codable {
   public let rawValue: String
 
   public var date: Date? {

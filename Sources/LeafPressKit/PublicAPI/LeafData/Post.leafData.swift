@@ -1,8 +1,8 @@
 import LeafKit
 import Foundation
 
-extension Post {
-  var leafData: LeafData {
+extension Post: LeafDataRepresentable {
+  public var leafData: LeafData {
     let dict = [
       "slug": self.slug.rawValue.leafData,
       "title": self.title.leafData,
