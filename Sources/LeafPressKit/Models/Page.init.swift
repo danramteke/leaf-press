@@ -1,7 +1,7 @@
 import Foundation
 import NIO
 
-extension Page {
+extension Page: InputFileInitable {
   init?(config: Config, inputFile: InputFile) {
     let target = FileLocation(root: config.distDir.string, directoryPath: inputFile.source.directoryPath, slug: inputFile.source.slug, fileType: .html, publishType: .page)
 

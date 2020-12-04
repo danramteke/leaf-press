@@ -12,9 +12,9 @@ public class BuildAction {
       .map { _ in
         CreateDirectoriesAction(config: config).start()
       }
-      .flatMap { _  -> Result<Void, Error> in
+      .flatMap { _ -> Result<Void, Error> in
         if ignoreStatic {
-          return .success(())
+          return Result<Void, Error>.success(())
         } else {
           return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
         }
@@ -26,54 +26,20 @@ public class BuildAction {
 
   private func doBuild() -> Result<Void, Error> {
 
+    let pagesTree = FileTree(root: self.config.pagesDir, publishType: .page)
+    let postsTree = FileTree(root: self.config.postsDir, publishType: .post)
+
     let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 3)
     let eventLoop = eventLoopGroup.next()
     let threadPool = NIOThreadPool(numberOfThreads: 3)
     threadPool.start()
 
-    let pagesTree = FileTree(root: self.config.pagesDir, publishType: .page)
-    let postsTree = FileTree(root: self.config.postsDir, publishType: .post)
-
-
-    let pagesInputFiles = pagesTree.load(in: threadPool, on: eventLoop)
-    let postsInputFiles = postsTree.load(in: threadPool, on: eventLoop)
-
-    let futurePageIRs = pagesInputFiles.map { (inputFileFuture) -> EventLoopFuture<Page?> in
-      inputFileFuture.map { (inputFile) -> (Page?) in
-        Page(config: self.config, inputFile: inputFile)
-      }
-    }
-    let futurePostIRs = postsInputFiles.map { (inputFileFuture) -> EventLoopFuture<Post?> in
-      inputFileFuture.map { (inputFile) -> (Post?) in
-        Post(config: self.config, inputFile: inputFile)
-      }
-    }
-
-    let futurePages: EventLoopFuture<[Page]> = EventLoopFuture<Page?>.whenAllComplete(futurePageIRs, on: eventLoop).map { (results) -> [Page] in
-      results.compactMap { (result) -> Page? in
-        switch result {
-        case .success(let maybe): return maybe
-        case .failure(let error):
-          print(error)
-          return nil
-        }
-      }
-    }
-
-    let futurePosts: EventLoopFuture<[Post]> = EventLoopFuture<Post?>.whenAllComplete(futurePostIRs, on: eventLoop).map { (results) -> [Post] in
-      results.compactMap { (result) -> Post? in
-        switch result {
-        case .success(let maybe): return maybe
-        case .failure(let error):
-          print(error)
-          return nil
-        }
-      }
-    }
+    let futurePosts: EventLoopFuture<[Post]> = self.loadRenderables(from: postsTree, in: threadPool, on: eventLoop)
+    let futurePages: EventLoopFuture<[Page]> = self.loadRenderables(from: pagesTree, in: threadPool, on: eventLoop)
 
     let renderer = Renderer(config: config)
 
-    let flag = futurePages.and(futurePosts).flatMap { (pages, posts ) -> EventLoopFuture<Void> in
+    let flag = futurePages.and(futurePosts).flatMap { (pages, posts) -> EventLoopFuture<Void> in
 
       let website = Website(pages: pages,
                             posts: posts)
@@ -82,15 +48,30 @@ public class BuildAction {
                              on: eventLoop)
     }
 
-
-    do {
+    return Result<Void, Error> {
       try flag.wait()
       try eventLoopGroup.syncShutdownGracefully()
       try threadPool.syncShutdownGracefully()
     }
-    catch {
-      return .failure(error)
+  }
+
+  private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<[T]> {
+
+    let things: [EventLoopFuture<T?>] = fileTree.load(in: threadPool, on: eventLoop).map { (inputFileFuture) in
+      inputFileFuture.map { (inputFile) -> (T?) in
+        T.init(config: self.config, inputFile: inputFile)
+      }
     }
-    return .success(())
+
+    return EventLoopFuture<T?>.whenAllComplete(things, on: eventLoop).map { (results) -> [T] in
+      results.compactMap { (result) -> T? in
+        switch result {
+        case .success(let maybe): return maybe
+        case .failure(let error):
+          print(error)
+          return nil
+        }
+      }
+    }
   }
 }

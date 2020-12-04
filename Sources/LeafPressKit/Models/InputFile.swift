@@ -2,21 +2,11 @@ import Foundation
 import PathKit
 import NIO
 
-struct ContentInputFile {
-  let content: String
-
-  init(string: String) {
-    let lines = string.components(separatedBy: "\n")
-    if let idx = lines.firstIndex(of: "---") {
-      self.content = lines[idx...].joined(separator: "\n")
-    } else {
-      self.content = string
-    }
-  }
+protocol InputFileInitable {
+  init?(config: Config, inputFile: InputFile)
 }
 
 struct InputFile {
-  //  let rawValue: String
   let frontMatter: [String: String]
   let source: FileLocation
 
@@ -67,7 +57,6 @@ extension InputFile {
     } else {
       self.init(frontMatter: [:], source: fileLocation)
     }
-
   }
   init(buffer: ByteBuffer, at fileLocation: FileLocation) {
     self.init(string: String(buffer: buffer), at: fileLocation)

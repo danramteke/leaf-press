@@ -1,7 +1,7 @@
 import NIO
 import Foundation
 
-extension Post {
+extension Post: InputFileInitable {
   init?(config: Config, inputFile: InputFile) {
 
     let target = FileLocation(root: config.distDir.string, directoryPath: inputFile.source.directoryPath, slug: inputFile.source.slug, fileType: .html, publishType: .post)
