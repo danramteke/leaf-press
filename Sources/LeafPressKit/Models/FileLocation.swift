@@ -1,7 +1,7 @@
 import Foundation
 import PathKit
 
-enum PublishType {
+enum PublishType: String, Codable {
   case page, post
 
   var templateName: String {
@@ -12,7 +12,7 @@ enum PublishType {
   }
 }
 
-public struct FileLocation: Hashable {
+public struct FileLocation: Hashable, Codable {
   let root: String
   let relativePath: String // relative path from root to file
   let slug: String // filename without extensions
@@ -52,7 +52,7 @@ public struct FileLocation: Hashable {
 }
 
 
-enum FileType: String, CaseIterable, Equatable, Hashable {
+enum FileType: String, CaseIterable, Equatable, Hashable, Codable{
   case mdLeaf = ".md.leaf"
   case md = ".md", leaf = ".leaf", html = ".html"
 

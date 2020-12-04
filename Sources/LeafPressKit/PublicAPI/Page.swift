@@ -1,7 +1,7 @@
 import Foundation
 import PathKit
 
-public struct Page {
+public struct Page: Codable {
   public typealias Id = Tagged<Page, String>
   public let slug: Id
   public let title: String
