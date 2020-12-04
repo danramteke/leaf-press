@@ -26,8 +26,8 @@ public class BuildAction {
 
   private func doBuild() -> Result<Void, Error> {
 
-    let pagesTree = FileTree(root: self.config.pagesDir, publishType: .page)
-    let postsTree = FileTree(root: self.config.postsDir, publishType: .post)
+    let pagesTree = FileTree(root: self.config.pagesDir)
+    let postsTree = FileTree(root: self.config.postsDir)
 
     let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 3)
     let eventLoop = eventLoopGroup.next()

@@ -50,7 +50,7 @@ class Renderer {
           "content": content.leafData
         ]
         return leafRenderer
-          .render(path: renderable.source.publishType.templateName, context: context)
+          .render(path: renderable.template, context: context)
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoop)
           }
@@ -67,7 +67,7 @@ class Renderer {
           "content": downContent.leafData
         ]
         return leafRenderer
-          .render(path: renderable.source.publishType.templateName, context: context)
+          .render(path: renderable.template, context: context)
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoop)
           }

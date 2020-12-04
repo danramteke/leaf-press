@@ -29,10 +29,6 @@ struct InputFile {
   var title: String? {
     frontMatter["title"]
   }
-
-  var publishType: PublishType {
-    source.publishType
-  }
 }
 
 extension InputFile {

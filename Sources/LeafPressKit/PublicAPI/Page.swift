@@ -2,6 +2,7 @@ import Foundation
 import PathKit
 
 public struct Page: Codable, Renderable {
+  public let template: String
 //  public typealias Id = Tagged<Page, String>
   public let slug: String
   public let title: String?

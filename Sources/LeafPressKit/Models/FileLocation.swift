@@ -1,16 +1,6 @@
 import Foundation
 import PathKit
 
-enum PublishType: String, Codable {
-  case page, post
-
-  var templateName: String {
-    switch self {
-    case .page: return "page.leaf"
-    case .post: return "post.leaf"
-    }
-  }
-}
 
 public struct FileLocation: Hashable, Codable {
   let root: String
@@ -18,17 +8,14 @@ public struct FileLocation: Hashable, Codable {
   let slug: String // filename without extensions
   let fileType: FileType
 
-  let publishType: PublishType
-
-  init(root: String, directoryPath: String, slug: String, fileType: FileType, publishType: PublishType) {
+  init(root: String, directoryPath: String, slug: String, fileType: FileType) {
     self.root = root
     self.directoryPath = directoryPath
     self.slug = slug
     self.fileType = fileType
-    self.publishType = publishType
   }
 
-  init?(path: Path, root: Path, publishType: PublishType) {
+  init?(path: Path, root: Path) {
     let filename = path.lastComponent
 
 
@@ -42,8 +29,7 @@ public struct FileLocation: Hashable, Codable {
     self.init(root: root.absolute().string,
               directoryPath: directoryPath,
               slug: slug,
-              fileType: fileType,
-              publishType: publishType)
+              fileType: fileType)
   }
 
   var absolutePath: Path {
