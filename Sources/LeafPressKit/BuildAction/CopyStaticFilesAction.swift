@@ -15,7 +15,7 @@ public struct CopyStaticFilesAction {
     self.target = target.absolute().string
   }
 
-  public func start() -> Result<Void, Error> {
+  public func start() -> Result<Void, Swift.Error> {
     let process = Process()
     process.launchPath = "/usr/bin/env"
     process.arguments = ["rsync", "-aq", source, target]

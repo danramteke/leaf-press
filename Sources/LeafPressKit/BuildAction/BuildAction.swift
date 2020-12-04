@@ -8,24 +8,23 @@ public class BuildAction {
   }
 
   public func build(ignoreStatic: Bool) -> Result<Void, Error> {
-
-    do {
-      try config.distDir.mkpath()
-    } catch {
-      return .failure(error)
-    }
-
-    if !ignoreStatic {
-      let copyStaticResult = CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
-      switch copyStaticResult {
-
-      case .failure(let error):
-        return .failure(error)
-      case .success:
-        break
+    Result<Void, Error>.success(())
+      .map { _ in
+        CreateDirectoriesAction(config: config).start()
       }
-    }
+      .flatMap { _  -> Result<Void, Error> in
+        if ignoreStatic {
+          return .success(())
+        } else {
+          return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
+        }
+      }
+      .flatMap { _ in
+        self.doBuild()
+      }
+  }
 
+  private func doBuild() -> Result<Void, Error> {
 
     let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 3)
     let eventLoop = eventLoopGroup.next()
@@ -92,13 +91,6 @@ public class BuildAction {
     catch {
       return .failure(error)
     }
-    print("pages:", pagesTree.fileLocations.map({ $0.relativePath }))
-    print("posts:", postsTree.fileLocations.map({ $0.relativePath }))
-
-
-
     return .success(())
   }
-
-
 }
