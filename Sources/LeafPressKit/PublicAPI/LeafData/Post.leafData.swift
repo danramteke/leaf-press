@@ -7,7 +7,7 @@ extension Post: LeafDataRepresentable {
       "slug": self.slug.leafData,
       "title": self.title?.leafData ?? LeafData.nil(.string),
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
-      "relativeUrl": self.relativeUrl.relativeString.leafData,
+      "relativeURL": self.relativeUrl.relativeString.leafData,
 
       "published": self.published.rawValue.leafData,
       "publishedDate": self.publishedDate.leafData,

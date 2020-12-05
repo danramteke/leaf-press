@@ -15,6 +15,9 @@ final class BuildCommand: Command {
 
     @Flag(name: "ignore-static", help: "Don't copy static files")
     var ignoreStatic: Bool
+
+    @Flag(name: "watch", help: "Watch the paths and rebuild the site as its modified.")
+    var watch: Bool
   }
 
   let help: String = "Build website"
