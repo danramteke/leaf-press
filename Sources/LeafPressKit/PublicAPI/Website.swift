@@ -6,6 +6,6 @@ public struct Website {
 
   public init(pages: [Page], posts: [Post]) {
     self.pages = pages
-    self.posts = posts
+    self.posts = posts.sorted()
   }
 }

@@ -12,26 +12,18 @@ extension Config {
     let postsDir: String?
     let staticFilesDir: String?
     let templatesDir: String?
-    init(distDir: String,
-         postsPublishPrefix: String,
-                pagesDir: String,
-                postsDir: String,
-                staticFilesDir: String,
-                templatesDir: String) {
-      self.distDir = distDir
-      self.postsPublishPrefix = postsPublishPrefix
-      self.templatesDir = templatesDir
-      self.staticFilesDir = staticFilesDir
-      self.postsDir = postsDir
-      self.pagesDir = pagesDir
-    }
+    let publishedDateStyle: String?
+    let publishedTimeStyle: String?
+
     static let `default`: Config = .init(
       distDir: "dist",
       postsPublishPrefix: "posts",
       pagesDir: "pages",
       postsDir: "posts",
       staticFilesDir: "static",
-      templatesDir: "templates")
+      templatesDir: "templates",
+      publishedDateStyle: .medium,
+      publishedTimeStyle: nil)
   }
 
   init(cli: Cli, workDir: Path) {
@@ -40,7 +32,15 @@ extension Config {
               pagesDir: workDir.appending(cli.pagesDir, default: Cli.default.pagesDir),
               postsDir: workDir.appending(cli.postsDir, default: Cli.default.postsDir),
               staticFilesDir: workDir.appending(cli.staticFilesDir, default: Cli.default.staticFilesDir),
-              templatesDir: workDir.appending(cli.templatesDir, default: Cli.default.templatesDir))
+              templatesDir: workDir.appending(cli.templatesDir, default: Cli.default.templatesDir),
+              publishedDateStyle: cli.publishedDateStyle?.asDateStyle ?? Cli.default.publishedDateStyle,
+              publishedTimeStyle: cli.publishedTimeStyle?.asDateStyle ?? Cli.default.publishedTimeStyle)
+
   }
 }
 
+extension String {
+  var asDateStyle: Config.DateStyle? {
+    Config.DateStyle(rawValue: self)
+  }
+}

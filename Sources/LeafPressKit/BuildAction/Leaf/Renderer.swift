@@ -60,17 +60,17 @@ class Renderer {
 
       case .md:
         do {
-        let downContent = try Down(markdownString: content).toHTML(.unsafe)
-        let context = [
-          "current": renderable.leafData,
-          "website": website.leafData,
-          "content": downContent.leafData
-        ]
-        return leafRenderer
-          .render(path: renderable.template, context: context)
-          .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
-            return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoop)
-          }
+          let downContent = try Down(markdownString: content).toHTML(.unsafe)
+          let context = [
+            "current": renderable.leafData,
+            "website": website.leafData,
+            "content": downContent.leafData
+          ]
+          return leafRenderer
+            .render(path: renderable.template, context: context)
+            .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+              return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoop)
+            }
         } catch {
           return eventLoop.makeFailedFuture(error)
         }

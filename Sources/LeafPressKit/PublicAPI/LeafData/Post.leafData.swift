@@ -9,7 +9,8 @@ extension Post: LeafDataRepresentable {
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
       "relativeUrl": self.relativeUrl.relativeString.leafData,
 
-      "published": self.published?.date?.leafData ?? self.published?.rawValue.leafData ?? LeafData.nil(.string)
+      "published": self.published.rawValue.leafData,
+      "publishedDate": self.publishedDate.leafData,
     ]
     return LeafData.dictionary(dict)
   }
