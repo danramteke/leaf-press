@@ -3,7 +3,8 @@ import PathKit
 import XCTest
 
 func assertDirectoriesMatch(expectedDir: Path, actualDir: Path, file: StaticString = #file, line: UInt = #line) throws {
-  try expectedDir.glob("{*,**/*}").forEach { expectedPath in
+  try expectedDir.glob("{*,**/*}.*").forEach { expectedPath in
+    print("matching ", expectedPath.string)
     let relativePath = expectedPath.relative(to: expectedDir)
 
     let expectedContents: Data = try expectedPath.read()
@@ -12,15 +13,15 @@ func assertDirectoriesMatch(expectedDir: Path, actualDir: Path, file: StaticStri
 
     do {
       let actualContents: Data = try actualPath.read()
-      XCTAssertEqual(actualContents, expectedContents, file: file, line: line)
 
-      if let actualContentsString = String(data: actualContents, encoding: .utf8),
-         let expectedContentsString = String(data: expectedContents, encoding: .utf8) {
+      if let actualContentsString = String(data: actualContents, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+         let expectedContentsString = String(data: expectedContents, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
         XCTAssertEqual(actualContentsString, expectedContentsString, file: file, line: line)
+      } else {
+        XCTAssertEqual(actualContents, expectedContents, file: file, line: line)
       }
     } catch {
       XCTFail("expected \(relativePath.string) to be readable at \(actualPath.string)", file: file, line: line)
-
     }
   }
 }

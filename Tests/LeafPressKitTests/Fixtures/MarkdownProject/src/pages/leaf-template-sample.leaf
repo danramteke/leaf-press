@@ -1,0 +1,7 @@
+Bread: Bagel
+template: page.leaf
+---
+
+<h1>Sample Page</h1>
+
+The sample property has a value of #(current.frontMatter.Bread)

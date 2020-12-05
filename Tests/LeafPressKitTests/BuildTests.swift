@@ -3,7 +3,7 @@ import LeafPressKit
 import PathKit
 
 class BuildTests: XCTestCase {
-  func testAsdf() throws {
+  func testMarkdownProject() throws {
     let tmpDir = Path("/tmp/leaf-press/Tests")
     try tmpDir.mkpath()
 
@@ -27,16 +27,19 @@ class BuildTests: XCTestCase {
                         postBuildScript: nil)
 
 
-    let result = BuildAction(config: config).build(ignoreStatic: false)
-    switch result {
+    switch BuildAction(config: config).build(ignoreStatic: false) {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
     case .success:
-      break
+      try assertDirectoriesMatch(expectedDir: expectedDir, actualDir: distDir)
     }
 
 
-    
-    try assertDirectoriesMatch(expectedDir: expectedDir, actualDir: distDir)
+    switch RoutesAction(config: config).list() {
+    case .failure(let error):
+      XCTFail("Failure building. Error: \(error.localizedDescription)")
+    case .success(let routes):
+      XCTAssertEqual(routes, ["/frontmatter-template-sample.html", "/leaf-template-sample.html", "/posts/sample-post.html"])
+    }
   }
 }
