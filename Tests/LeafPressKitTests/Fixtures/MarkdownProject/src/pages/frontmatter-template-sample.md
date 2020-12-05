@@ -1,7 +1,10 @@
 template: custom.leaf
+title: Custom Template Sample
 ---
 
-<h1>Custom Template Sample</h1>
+# Custom Template Sample
 
-<p>This is a custom template</p>
+This demonstrates using a custom template for a page.
+
+Pages can be markdown or html. The content will be passed to the template in the `content` leaf variable.
 
