@@ -2,14 +2,22 @@ import XCTest
 import LeafPressKit
 import PathKit
 
-class BuildTests: XCTestCase {
+class IntegrationTests: XCTestCase {
+  
   func testMarkdownProject() throws {
+    let testMode = TestMode.compare
+
     let tmpDir = Path("/tmp/leaf-press/Tests")
     try tmpDir.mkpath()
 
     let workDir = Path(Bundle.module.resourcePath!) + Path("Fixtures/MarkdownProject/src")
     let expectedDir = Path(Bundle.module.resourcePath!) + Path("Fixtures/MarkdownProject/expected")
-    let distDir = tmpDir + Path("MarkdownProject")
+    let distDir: Path = {
+      switch testMode {
+      case .compare: return tmpDir + Path("MarkdownProject")
+      case .record(let path): return path
+      }
+    }()
 
     try? distDir.delete()
 
@@ -26,7 +34,10 @@ class BuildTests: XCTestCase {
                         publishedTimeStyle: nil,
                         postBuildScript: nil)
 
-
+    switch testMode {
+      case .record: return
+      case .compare: break
+    }
     switch BuildAction(config: config).build(ignoreStatic: false) {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
@@ -39,7 +50,7 @@ class BuildTests: XCTestCase {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
     case .success(let routes):
-      XCTAssertEqual(routes, ["/frontmatter-template-sample.html", "/leaf-template-sample.html", "/posts/sample-post.html"])
+      XCTAssertEqual(routes, ["/frontmatter-template-sample.html", "/pure-leaf-template-sample.html", "/posts/sample-post.html"])
     }
   }
 }
