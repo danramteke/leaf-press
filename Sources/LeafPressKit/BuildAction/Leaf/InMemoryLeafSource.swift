@@ -29,13 +29,4 @@ class InMemoryLeafSource: LeafSource {
       memory[path] = nil
     }
   }
-
-  @inlinable
-  func with<ReturnType>(content: String, at path: String, block: () -> (ReturnType)) -> ReturnType {
-    self.register(content: content, at: path)
-    defer {
-      self.removeContent(at: path)
-    }
-    return block()
-  }
 }
