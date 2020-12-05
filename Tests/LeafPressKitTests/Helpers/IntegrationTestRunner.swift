@@ -16,6 +16,8 @@ struct IntegrationTestRunner {
     try distDir.mkpath()
 
     print("*** Building project to \(distDir.string)")
+    print("*** View using")
+    print("*** docker run -p 8080:80 -v \(distDir.string)/:/usr/share/nginx/html/ nginx")
 
     let config = Config(workDir: workDir,
                         distDir: distDir,
