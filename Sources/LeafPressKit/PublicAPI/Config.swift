@@ -21,3 +21,16 @@ public struct Config {
     self.templatesDir = templatesDir
   }
 }
+
+extension Config {
+  func sourcePath<T: Renderable & InputFileInitable>(for atype: T) -> Path? {
+    switch atype {
+    case is Post:
+      return self.postsDir
+    case is Page:
+      return self.pagesDir
+    default:
+      return nil
+    }
+  }
+}
