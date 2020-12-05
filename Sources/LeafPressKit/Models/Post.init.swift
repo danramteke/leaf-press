@@ -25,7 +25,7 @@ extension Post: InputFileInitable {
     }
     
     self.init(
-      template: "post.leaf",
+      template: inputFile.template ?? "post.leaf",
       slug: inputFile.source.slug,
       title: inputFile.title,
       summary: inputFile.summary,

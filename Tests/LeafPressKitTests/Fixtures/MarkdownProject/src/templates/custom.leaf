@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div>
+    Custom template
+    </div>
+    <div id="custom-content">
+
+#(content)
+
+    </div>
+  </body>
+</html>

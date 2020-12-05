@@ -30,6 +30,10 @@ struct InputFile {
   var title: String? {
     frontMatter["title"]
   }
+
+  var template: String? {
+    frontMatter["template"]
+  }
 }
 
 extension InputFile {

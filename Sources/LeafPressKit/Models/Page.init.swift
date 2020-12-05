@@ -10,7 +10,7 @@ extension Page: InputFileInitable {
       fileType: .html)
 
     self.init(
-      template: "page.leaf",
+      template: inputFile.template ?? "page.leaf",
       slug: inputFile.source.slug,
       title: inputFile.title,
       summary: inputFile.summary,
