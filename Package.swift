@@ -31,7 +31,15 @@ let package = Package(
             dependencies: [
               "Down",
               "PathKit",
-
               .product(name: "LeafKit", package: "leaf-kit"),
             ]),
+    .testTarget(name: "LeafPressKitTests",
+                dependencies: [
+                  "LeafPressKit",
+                  "PathKit"
+                ],
+                resources: [
+                  .copy("Fixtures")
+                ]
+    )
   ])
