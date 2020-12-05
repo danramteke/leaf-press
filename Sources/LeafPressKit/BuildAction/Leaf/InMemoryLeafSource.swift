@@ -1,24 +1,41 @@
 import LeafKit
 import Foundation
 import NIO
+import NIOConcurrencyHelpers
 
 class InMemoryLeafSource: LeafSource {
+  private let lock = Lock()
   var memory: [String: String] = .init()
   func file(template: String, escape: Bool, on eventLoop: EventLoop) throws -> EventLoopFuture<ByteBuffer> {
-    if let string = memory[template] {
-      return eventLoop.makeSucceededFuture(ByteBuffer(string: string))
-    } else {
-      return eventLoop.makeFailedFuture(NotFoundError())
+    self.lock.withLock {
+      if let string = memory[template] {
+        return eventLoop.makeSucceededFuture(ByteBuffer(string: string))
+      } else {
+        return eventLoop.makeFailedFuture(NotFoundError())
+      }
     }
   }
 
   struct NotFoundError: Error { }
 
   func register(content: String, at path: String) {
-    memory[path] = content
+    self.lock.withLock {
+      memory[path] = content
+    }
   }
 
   func removeContent(at path: String) {
-    memory[path] = nil
+    self.lock.withLock {
+      memory[path] = nil
+    }
+  }
+
+  @inlinable
+  func with<ReturnType>(content: String, at path: String, block: () -> (ReturnType)) -> ReturnType {
+    self.register(content: content, at: path)
+    defer {
+      self.removeContent(at: path)
+    }
+    return block()
   }
 }

@@ -11,4 +11,8 @@ public struct Page: Codable, Renderable {
   public let source: FileLocation
   public let target: FileLocation
   public let relativeUrl: URL
+
+  public let frontMatter: [String: String]
+
+  let sha256: String
 }

@@ -16,6 +16,8 @@ extension Page: InputFileInitable {
       summary: inputFile.summary,
       source: inputFile.source,
       target: target,
-      relativeUrl: target.relativeURL)
+      relativeUrl: target.relativeURL,
+      frontMatter: inputFile.frontMatter,
+      sha256: inputFile.sha256)
   }
 }

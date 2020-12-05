@@ -17,5 +17,9 @@ public struct Post: Codable, Renderable, Comparable, Equatable {
   public let target: FileLocation
   public let relativeUrl: URL
 
-  public let publishedDate: Date 
+  public let publishedDate: Date
+
+  public let frontMatter: [String: String]
+
+  let sha256: String
 }

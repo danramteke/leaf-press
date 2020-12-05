@@ -5,6 +5,8 @@ import PathKit
 import Down
 
 class Renderer {
+  let inMemory = InMemoryLeafSource()
+
   let config: Config
   init(config: Config) {
     self.config = config
@@ -16,7 +18,6 @@ class Renderer {
     let templatesDir = config.templatesDir.absolute().string
     let leafConfig = LeafConfiguration(rootDirectory: templatesDir)
     let sources = LeafSources.singleSource(NIOLeafFiles(fileio: io, sandboxDirectory: templatesDir, viewDirectory: templatesDir))
-    let inMemory = InMemoryLeafSource()
     try! sources.register(source: "in-memory", using: inMemory, searchable: true)
     let leafRenderer = LeafRenderer(
       configuration: leafConfig,
@@ -41,7 +42,8 @@ class Renderer {
 
   private func render(renderable: Renderable, leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Void> {
     renderable.source.read(with: io, on: eventLoopGroup.next()).flatMap { (buffer) -> EventLoopFuture<Void> in
-      let content = ContentInputFile(string: String(buffer: buffer)).content
+      let inputFile = ContentInputFile(string: String(buffer: buffer))
+      let content = inputFile.content
 
 
       switch renderable.source.fileType {
@@ -58,7 +60,19 @@ class Renderer {
           }
 
       case .leaf:
-        return eventLoopGroup.next().makeSucceededFuture(())
+        let context = [
+          "current": renderable.leafData,
+          "website": website.leafData,
+        ]
+
+        self.inMemory.register(content: content, at: inputFile.sha256)
+        return leafRenderer
+          .render(path: inputFile.sha256, context: context)
+          .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+            self.inMemory.removeContent(at: inputFile.sha256)
+            return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
+          }
+
 
       case .md:
         do {

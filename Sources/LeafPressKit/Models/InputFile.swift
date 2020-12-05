@@ -7,6 +7,7 @@ protocol InputFileInitable {
 }
 
 struct InputFile {
+  let sha256: String
   let frontMatter: [String: String]
   let source: FileLocation
 
@@ -49,9 +50,9 @@ extension InputFile {
                                                       return (key, val)
                                                     })
 
-      self.init(frontMatter: frontMatter, source: fileLocation)
+      self.init(sha256: string.sha256, frontMatter: frontMatter, source: fileLocation)
     } else {
-      self.init(frontMatter: [:], source: fileLocation)
+      self.init(sha256: string.sha256, frontMatter: [:], source: fileLocation)
     }
   }
   init(buffer: ByteBuffer, at fileLocation: FileLocation) {

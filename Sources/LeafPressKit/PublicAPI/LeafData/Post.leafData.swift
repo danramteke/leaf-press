@@ -11,6 +11,8 @@ extension Post: LeafDataRepresentable {
 
       "published": self.published.rawValue.leafData,
       "publishedDate": self.publishedDate.leafData,
+
+      "frontMatter": self.frontMatter.leafData
     ]
     return LeafData.dictionary(dict)
   }

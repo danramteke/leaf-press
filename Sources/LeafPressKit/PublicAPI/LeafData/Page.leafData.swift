@@ -8,6 +8,7 @@ extension Page: LeafDataRepresentable {
       "title": self.title?.leafData ?? LeafData.nil(.string),
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
       "relativeUrl": self.relativeUrl.relativeString.leafData,
+      "frontMatter": self.frontMatter.leafData
     ]
     return LeafData.dictionary(dict)
   }
