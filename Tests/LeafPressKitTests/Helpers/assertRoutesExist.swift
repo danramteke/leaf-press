@@ -2,7 +2,7 @@ import XCTest
 import Foundation
 import PathKit
 
-func assertRoutesExist(routes: [String], distDir: Path, file: StaticString = #file, line: UInt = #line) {
+func assertRoutesExist(routes: Set<String>, distDir: Path, file: StaticString = #file, line: UInt = #line) {
   for route in routes {
     var path: Path
     if route.hasPrefix("/") {

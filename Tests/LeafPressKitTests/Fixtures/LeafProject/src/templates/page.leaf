@@ -5,7 +5,7 @@
   <body>
     <div id="page-content">
 
-#(content)
+#import(content)
 
     </div>
   </body>

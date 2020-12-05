@@ -4,7 +4,7 @@ import XCTest
 import LeafPressKit
 
 struct IntegrationTestRunner {
-  func run(fixtureName: String, expectedRoutes: [String]) throws {
+  func run(fixtureName: String, expectedRoutes: Set<String>) throws {
     let tmpDir = Path("/tmp/leaf-press/Tests")
     try tmpDir.mkpath()
 
@@ -42,7 +42,7 @@ struct IntegrationTestRunner {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
     case .success(let routes):
-      XCTAssertEqual(routes, expectedRoutes)
+      XCTAssertEqual(Set(routes), expectedRoutes)
     }
 
     assertRoutesExist(routes: expectedRoutes, distDir: distDir)
