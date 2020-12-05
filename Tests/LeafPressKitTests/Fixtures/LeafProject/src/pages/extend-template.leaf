@@ -1,9 +1,8 @@
-#extend("page.leaf")
+#extend("page"):
 #export("content"):
 <h1>Extending a template</h1>
 
 <p>Leaf templates are pure leaf! This extends the <code>page.leaf</code> template.</p>
-
 
 #endexport
 #endextend

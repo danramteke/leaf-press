@@ -17,8 +17,11 @@ class Renderer {
 
     let templatesDir = config.templatesDir.absolute().string
     let leafConfig = LeafConfiguration(rootDirectory: templatesDir)
-    let sources = LeafSources.singleSource(NIOLeafFiles(fileio: io, sandboxDirectory: templatesDir, viewDirectory: templatesDir))
+
+    let sources = LeafSources.init()
     try! sources.register(source: "in-memory", using: inMemory, searchable: true)
+    try! sources.register(source: "templates", using: NIOLeafFiles(fileio: io, sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
+
     let leafRenderer = LeafRenderer(
       configuration: leafConfig,
       sources: sources,

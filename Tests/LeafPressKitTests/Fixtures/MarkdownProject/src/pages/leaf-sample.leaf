@@ -2,7 +2,7 @@ sampleProperty: sampleValue
 title: Pure Leaf Template Sample
 
 ---
-#extend("page.leaf")
+#extend("page.leaf"):
 #export("content"):
 <h1>Sample Leaf Page</h1>
 

@@ -15,7 +15,7 @@ struct IntegrationTestRunner {
     try? distDir.delete()
     try distDir.mkpath()
 
-    print("Building project to \(distDir.string)")
+    print("*** Building project to \(distDir.string)")
 
     let config = Config(workDir: workDir,
                         distDir: distDir,
