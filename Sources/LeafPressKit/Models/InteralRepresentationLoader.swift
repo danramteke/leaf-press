@@ -1,5 +1,6 @@
 import Foundation
 import NIO
+import PathKit
 
 class InternalRepresentationLoader {
 
@@ -10,25 +11,41 @@ class InternalRepresentationLoader {
 
   func load(pagesTree: FileTree, postsTree: FileTree, threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Website> {
 
-    let futurePosts: EventLoopFuture<[Post]> = self.loadRenderables(from: postsTree, in: threadPool, on: eventLoopGroup.next())
-    let futurePages: EventLoopFuture<[Page]> = self.loadRenderables(from: pagesTree, in: threadPool, on: eventLoopGroup.next())
-
+    let futurePages: EventLoopFuture<[Page]> = loadRenderablesAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+    let futurePosts: EventLoopFuture<[Post]> = loadRenderablesAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
 
     return futurePages.and(futurePosts).map { (pages, posts) -> Website in
       Website(pages: pages, posts: posts)
     }
-    
   }
 
+  private func loadRenderablesAt<T: Renderable & InputFileInitable>(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[T]> {
+    self.discoverFileTree(root: root, on: eventLoopGroup.next()).flatMap { tree in
+      return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup.next())
+    }
+  }
+
+  private func discoverFileTree(root: Path, on eventLoop: EventLoop) -> EventLoopFuture<FileTree> {
+    let promise = eventLoop.makePromise(of: FileTree.self)
+    DispatchQueue.global().async {
+      let fileLocations = root.glob(FileType.glob).compactMap { (childPath) -> FileLocation? in
+        FileLocation(path: childPath.absolute(), root: root)
+      }
+      promise.succeed(FileTree(fileLocations: fileLocations))
+    }
+    return promise.futureResult
+  }
+
+  // / ---
   private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<[T]> {
 
-    let things: [EventLoopFuture<T?>] = fileTree.load(in: threadPool, on: eventLoop).map { (inputFileFuture) in
+    let files: [EventLoopFuture<T?>] = fileTree.load(in: threadPool, on: eventLoop).map { (inputFileFuture) in
       inputFileFuture.map { (inputFile) -> (T?) in
         T.init(config: self.config, inputFile: inputFile)
       }
     }
 
-    return EventLoopFuture<T?>.whenAllComplete(things, on: eventLoop).map { (results) -> [T] in
+    return EventLoopFuture<T?>.whenAllComplete(files, on: eventLoop).map { (results) -> [T] in
       results.compactMap { (result) -> T? in
         switch result {
         case .success(let maybe): return maybe
