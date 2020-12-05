@@ -9,7 +9,11 @@ func assertDirectoriesMatch(expectedDir: Path, actualDir: Path, file: StaticStri
 
     let expectedContents: Data = try expectedPath.read()
     let actualPath = actualDir + relativePath
-    XCTAssertTrue(actualPath.exists, "expected \(relativePath.string) to exist at \(actualPath.string)", file: file, line: line)
+
+    guard actualPath.exists else {
+      XCTFail("expected \(relativePath.string) to exist at \(actualPath.string)", file: file, line: line)
+      return
+    }
 
     do {
       let actualContents: Data = try actualPath.read()

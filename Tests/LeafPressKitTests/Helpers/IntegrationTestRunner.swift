@@ -8,11 +8,13 @@ struct IntegrationTestRunner {
     let tmpDir = Path("/tmp/leaf-press/Tests")
     try tmpDir.mkpath()
 
+    print(Bundle.module.resourcePath!)
+
     let workDir = Path(Bundle.module.resourcePath!) + Path("Fixtures/\(fixtureName)/src")
     let expectedDir = Path(Bundle.module.resourcePath!) + Path("Fixtures/\(fixtureName)/expected")
     let distDir: Path = tmpDir + Path(fixtureName)
 
-    try? distDir.delete()
+    if distDir.exists { try distDir.delete() }
     try distDir.mkpath()
 
     print("*** Building project to \(distDir.string)")
