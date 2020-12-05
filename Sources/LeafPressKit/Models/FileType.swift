@@ -1,7 +1,6 @@
 import Foundation
 
 enum FileType: String, CaseIterable, Equatable, Hashable, Codable {
-  case mdLeaf = ".md.leaf"
   case md = ".md", leaf = ".leaf", html = ".html"
 
   static let glob: String = "{*,**/*}.{md,html,leaf}"

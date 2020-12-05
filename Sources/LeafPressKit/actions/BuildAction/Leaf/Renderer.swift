@@ -90,9 +90,6 @@ class Renderer {
         } catch {
           return eventLoopGroup.next().makeFailedFuture(error)
         }
-
-      case .mdLeaf:
-        return eventLoopGroup.next().makeSucceededFuture(())
       }
     }
   }
