@@ -44,5 +44,8 @@ struct IntegrationTestRunner {
     case .success(let routes):
       XCTAssertEqual(routes, expectedRoutes)
     }
+
+    assertRoutesExist(routes: expectedRoutes, distDir: distDir)
   }
+
 }
