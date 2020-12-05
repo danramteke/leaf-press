@@ -36,6 +36,7 @@ class BuildTests: XCTestCase {
     }
 
 
-//    expectedDir.glob("*").
+    
+    try assertDirectoriesMatch(expectedDir: expectedDir, actualDir: distDir)
   }
 }
