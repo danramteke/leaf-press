@@ -43,10 +43,12 @@ class Renderer {
     }
   }
 
+
+
   private func render(renderable: Renderable, leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Void> {
     renderable.source.read(with: io, on: eventLoopGroup.next()).flatMap { (buffer) -> EventLoopFuture<Void> in
       let inputFile = ContentInputFile(string: String(buffer: buffer))
-      let content = inputFile.content
+
 
 
       switch renderable.source.fileType {
@@ -54,11 +56,14 @@ class Renderer {
         let context = [
           "current": renderable.leafData,
           "website": website.leafData,
-          "content": content.leafData
         ]
+
+        let content = self.contentFor(template: renderable.template, content: inputFile.content)
+        self.inMemory.register(content: content, at: inputFile.sha256)
         return leafRenderer
-          .render(path: renderable.template, context: context)
+          .render(path: inputFile.sha256, context: context)
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+            self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
           }
 
@@ -68,7 +73,7 @@ class Renderer {
           "website": website.leafData,
         ]
 
-        self.inMemory.register(content: content, at: inputFile.sha256)
+        self.inMemory.register(content: inputFile.content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
@@ -79,15 +84,17 @@ class Renderer {
 
       case .md:
         do {
-          let downContent = try Down(markdownString: content).toHTML(.unsafe)
+          let downContent = try Down(markdownString: inputFile.content).toHTML(.unsafe)
           let context = [
             "current": renderable.leafData,
             "website": website.leafData,
-            "content": downContent.leafData
           ]
+          let content = self.contentFor(template: renderable.template, content: downContent)
+          self.inMemory.register(content: content, at: inputFile.sha256)
           return leafRenderer
-            .render(path: renderable.template, context: context)
+            .render(path: inputFile.sha256, context: context)
             .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+              self.inMemory.removeContent(at: inputFile.sha256)
               return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
             }
         } catch {
@@ -95,5 +102,16 @@ class Renderer {
         }
       }
     }
+
+  }
+
+  private func contentFor(template: String, content: String) -> String {
+    """
+#extend("\(template)"):
+#export("content"):
+\(content)
+#endexport
+#endextend
+"""
   }
 }
