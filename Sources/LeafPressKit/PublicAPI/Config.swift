@@ -1,6 +1,7 @@
 import Foundation
 import PathKit
 public struct Config {
+  public let workDir: Path
   public let distDir: Path
   public let postsPublishPrefix: Path
   public let pagesDir: Path
@@ -11,6 +12,8 @@ public struct Config {
   public let publishedDateStyle: DateStyle
   public let publishedTimeStyle: DateStyle?
 
+  public let postBuildScript: String?
+
   public func date(from string: String) -> Date? {
     self.dateFormatter.date(from: string)
   }
@@ -19,14 +22,17 @@ public struct Config {
     self.dateFormatter.string(from: date)
   }
   private let dateFormatter: DateFormatter
-  public init(distDir: Path,
+  public init(workDir: Path,
+              distDir: Path,
               postsPublishPrefix: Path,
               pagesDir: Path,
               postsDir: Path,
               staticFilesDir: Path,
               templatesDir: Path,
               publishedDateStyle: DateStyle,
-              publishedTimeStyle: DateStyle?) {
+              publishedTimeStyle: DateStyle?,
+              postBuildScript: String?) {
+    self.workDir = workDir
     self.distDir = distDir
     self.postsPublishPrefix = postsPublishPrefix
     self.pagesDir = pagesDir
@@ -39,6 +45,7 @@ public struct Config {
     dateFormatter.timeStyle = publishedTimeStyle?.style ?? .none
     dateFormatter.dateStyle = publishedDateStyle.style
     self.dateFormatter = dateFormatter
+    self.postBuildScript = postBuildScript
   }
 
   public enum DateStyle: String, Codable {

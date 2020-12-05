@@ -22,6 +22,22 @@ public class BuildAction {
       .flatMap { _ in
         self.renderWebsite()
       }
+      .flatMap { _ in
+        guard let script = config.postBuildScript else {
+          return .success(())
+        }
+
+        return self.runPostBuild(script: script)
+      }
+  }
+
+  private func runPostBuild(script: String) -> Result<Void, Error> {
+
+
+      print("running post build script")
+      return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
+
+
   }
 
   private func renderWebsite() -> Result<Void, Error> {
