@@ -7,19 +7,19 @@ extension Config {
 
   struct Cli: Codable {
     let distDir: String?
-    let distPostDir: String?
+    let postsPublishPrefix: String?
     let pagesDir: String?
     let postsDir: String?
     let staticFilesDir: String?
     let templatesDir: String?
     init(distDir: String,
-         distPostDir: String,
+         postsPublishPrefix: String,
                 pagesDir: String,
                 postsDir: String,
                 staticFilesDir: String,
                 templatesDir: String) {
       self.distDir = distDir
-      self.distPostDir = distPostDir
+      self.postsPublishPrefix = postsPublishPrefix
       self.templatesDir = templatesDir
       self.staticFilesDir = staticFilesDir
       self.postsDir = postsDir
@@ -27,7 +27,7 @@ extension Config {
     }
     static let `default`: Config = .init(
       distDir: "dist",
-      distPostDir: "dist/posts",
+      postsPublishPrefix: "posts",
       pagesDir: "pages",
       postsDir: "posts",
       staticFilesDir: "static",
@@ -36,7 +36,7 @@ extension Config {
 
   init(cli: Cli, workDir: Path) {
     self.init(distDir: workDir.appending(cli.distDir, default: Cli.default.distDir),
-              distPostDir: workDir.appending(cli.distPostDir, default: Cli.default.distPostDir),
+              postsPublishPrefix: Path(cli.postsPublishPrefix ?? Cli.default.postsPublishPrefix.string),
               pagesDir: workDir.appending(cli.pagesDir, default: Cli.default.pagesDir),
               postsDir: workDir.appending(cli.postsDir, default: Cli.default.postsDir),
               staticFilesDir: workDir.appending(cli.staticFilesDir, default: Cli.default.staticFilesDir),

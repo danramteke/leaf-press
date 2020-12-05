@@ -10,7 +10,7 @@ public struct CreateDirectoriesAction {
   public func start() -> Result<Void, Error> {
     return Result {
       try config.distDir.mkpath()
-      try config.distPostDir.mkpath()
+      try (config.distDir + config.postsPublishPrefix).mkpath()
     }
   }
 }

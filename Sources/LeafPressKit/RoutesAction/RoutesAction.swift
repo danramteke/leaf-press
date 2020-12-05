@@ -8,15 +8,12 @@ public class RoutesAction {
   }
 
   public func list() -> Result<[String], Error> {
-    let pagesTree = FileTree(root: self.config.pagesDir)
-    let postsTree = FileTree(root: self.config.postsDir)
-
 
     return Result {
 
-      try MultiThreadedContext().run { (eventLoopGroup, threadPool) -> EventLoopFuture<[String]> in
-        InternalRepresentationLoader(config: config)
-          .load(pagesTree: pagesTree, postsTree: postsTree, threadPool: threadPool, eventLoopGroup: eventLoopGroup)
+      try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) -> EventLoopFuture<[String]> in
+        return InternalRepresentationLoader(config: config)
+          .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .map { (website) -> [String] in
           website.pages.map({ $0.relativeUrl.path })
           +

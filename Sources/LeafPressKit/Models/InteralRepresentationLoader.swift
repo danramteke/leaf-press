@@ -9,7 +9,7 @@ class InternalRepresentationLoader {
     self.config = config
   }
 
-  func load(pagesTree: FileTree, postsTree: FileTree, threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Website> {
+  func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Website> {
 
     let futurePages: EventLoopFuture<[Page]> = loadRenderablesAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
     let futurePosts: EventLoopFuture<[Post]> = loadRenderablesAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
@@ -36,10 +36,9 @@ class InternalRepresentationLoader {
     return promise.futureResult
   }
 
-  // / ---
   private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<[T]> {
 
-    let files: [EventLoopFuture<T?>] = fileTree.load(in: threadPool, on: eventLoop).map { (inputFileFuture) in
+    let files: [EventLoopFuture<T?>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoop).map { (inputFileFuture) in
       inputFileFuture.map { (inputFile) -> (T?) in
         T.init(config: self.config, inputFile: inputFile)
       }
@@ -53,6 +52,16 @@ class InternalRepresentationLoader {
           print(error)
           return nil
         }
+      }
+    }
+  }
+
+  private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> [EventLoopFuture<InputFile>] {
+    let io = NonBlockingFileIO(threadPool: threadPool)
+
+    return fileTree.fileLocations.map { (location) -> EventLoopFuture<InputFile> in
+      location.read(with: io, on: eventLoop).map { (buffer) -> InputFile in
+        return InputFile(buffer: buffer, at: location)
       }
     }
   }

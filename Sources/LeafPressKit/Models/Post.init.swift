@@ -1,10 +1,16 @@
 import NIO
 import Foundation
+import PathKit
 
 extension Post: InputFileInitable {
   init?(config: Config, inputFile: InputFile) {
-    
-    let target = FileLocation(root: config.distDir.string, directoryPath: inputFile.source.directoryPath, slug: inputFile.source.slug, fileType: .html)
+    let directoryPath: Path = config.postsPublishPrefix + Path(inputFile.source.directoryPath)
+
+    let target = FileLocation(
+      root: config.distDir.string,
+      directoryPath: directoryPath.string,
+      slug: inputFile.source.slug,
+      fileType: .html)
     
     self.init(
       template: "post.leaf",

@@ -41,6 +41,6 @@ public struct FileLocation: Hashable, Codable {
   }
 
   var relativeURL: URL {
-    URL(string: relativePath.string)!
+    URL(string: "/" + relativePath.string)!
   }
 }
