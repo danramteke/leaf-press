@@ -1,12 +1,13 @@
 import NIO
 import Foundation
 
-struct MultiThreadedContext<ReturnType> {
+struct MultiThreadedContext {
   let numberOfThreads: Int
   init(numberOfThreads: Int) {
     self.numberOfThreads = numberOfThreads
   }
-  func run(block: (EventLoopGroup, NIOThreadPool) -> EventLoopFuture<ReturnType>) throws -> ReturnType {
+
+  func run<ReturnType>(block: (EventLoopGroup, NIOThreadPool) -> EventLoopFuture<ReturnType>) throws -> ReturnType {
     let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
     let threadPool = NIOThreadPool(numberOfThreads: numberOfThreads)
     threadPool.start()
