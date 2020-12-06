@@ -49,7 +49,7 @@ class InternalRepresentationLoader {
         switch result {
         case .success(let maybe): return maybe
         case .failure(let error):
-          print(error)
+          print("***", error)
           return nil
         }
       }

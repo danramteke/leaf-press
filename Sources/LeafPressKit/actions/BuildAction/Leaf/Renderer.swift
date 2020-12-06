@@ -20,7 +20,7 @@ class Renderer {
 
     let sources = LeafSources.init()
     try! sources.register(source: "in-memory", using: inMemory, searchable: true)
-    try! sources.register(source: "templates", using: NIOLeafFiles(fileio: io, sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
+    try! sources.register(source: "default", using: NIOLeafFiles(fileio: io, limits: NIOLeafFiles.Limit(rawValue: 0), sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
 
     let leafRenderer = LeafRenderer(
       configuration: leafConfig,
@@ -62,6 +62,10 @@ class Renderer {
         self.inMemory.register(content: content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
+          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
+            print(error)
+            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
+          })
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
@@ -76,6 +80,10 @@ class Renderer {
         self.inMemory.register(content: inputFile.content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
+          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
+            print(error)
+            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
+          })
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
@@ -93,6 +101,11 @@ class Renderer {
           self.inMemory.register(content: content, at: inputFile.sha256)
           return leafRenderer
             .render(path: inputFile.sha256, context: context)
+            .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
+              let string = "An error occurred rendering '\(renderable.source.slug)':\n\(error)"
+              print(string)
+              return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: string))
+            })
             .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
               self.inMemory.removeContent(at: inputFile.sha256)
               return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
@@ -106,8 +119,8 @@ class Renderer {
   }
 
   private func contentFor(template: String, content: String) -> String {
-    """
-#extend("\(template)"):
+    return """
+#extend("\(templateSlug)"):
 #export("content"):
 \(content)
 #endexport
