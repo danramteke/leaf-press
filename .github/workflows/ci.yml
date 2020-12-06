@@ -45,12 +45,12 @@ jobs:
       - 
         name: Release path
         id: release_path
-        run: echo "::set-output name=BIN_PATH::$(swift build -c release --show-bin-path)"
+        run: echo "::set-output name=BIN_PATH::$(swift build -c release --show-bin-path)/leaf-press"
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: executable
+          name: leaf-press
           path: ${{ steps.release_path.outputs.BIN_PATH }}
       - name: Archive Test Artifacts
         uses: actions/upload-artifact@v2
