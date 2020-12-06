@@ -5,7 +5,7 @@ import LeafPressKit
 
 struct IntegrationTestRunner {
   func run(fixtureName: String, expectedRoutes: Set<String>) throws {
-    let tmpDir = Path("/tmp/leaf-press/Tests")
+    let tmpDir = Path("tmp/TestOutput")
     try tmpDir.mkpath()
 
     print(Bundle.module.resourcePath!)

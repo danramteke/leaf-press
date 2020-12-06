@@ -13,7 +13,7 @@ class IntegrationTests: XCTestCase {
 
   func testLeafProject() throws {
     let fixtureName = "LeafProject"
-    let expectedRoutes: Set<String> = ["/index.html", "/frontmatter.html", "/extend-template.html", "/frontmatter-variable.html"]
+    let expectedRoutes: Set<String> = ["/index.html", "/frontmatter.html", "/extend-template.html", "/frontmatter-variable.html", "/partials.html"]
 
     try IntegrationTestRunner().run(fixtureName: fixtureName, expectedRoutes: expectedRoutes)
   }
