@@ -15,7 +15,7 @@ public struct ScriptAction {
 
 
     let process = Process()
-    process.launchPath = "/bin/sh"
+    process.executableURL = URL(string: "file:///bin/sh")!
     process.arguments = ["-c", script]
 
     let stdOut = Pipe()
@@ -28,7 +28,11 @@ public struct ScriptAction {
     stdErr.fileHandleForReading.readabilityHandler = Self.filePipeHandler
 
 
-    process.launch()
+    do {
+    try process.run()
+    } catch {
+      return .failure(error)
+    }
     process.waitUntilExit()
     if process.terminationStatus == 0 {
       return .success(())

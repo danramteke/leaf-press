@@ -17,7 +17,7 @@ public struct CopyStaticFilesAction {
 
   public func start() -> Result<Void, Swift.Error> {
     let process = Process()
-    process.launchPath = "/usr/bin/env"
+    process.executableURL = URL(string: "file:///usr/bin/env")!
     process.arguments = ["rsync", "-aq", source, target]
 
 //    let stdOut = Pipe()
@@ -25,7 +25,12 @@ public struct CopyStaticFilesAction {
 
 //    process.standardOutput = stdOut
     process.standardError = stdErr
-    process.launch()
+
+    do {
+      try process.run()
+    } catch {
+      return .failure(error)
+    }
     process.waitUntilExit()
 
 //    let stdOutData = stdOut.fileHandleForReading.readDataToEndOfFile()
