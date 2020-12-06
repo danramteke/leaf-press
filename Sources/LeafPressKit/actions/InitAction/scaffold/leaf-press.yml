@@ -1,1 +1,5 @@
 postsDirPrefix: blog # defaults to posts
+
+## optionally, run a script after generating your site. 
+## Maybe run `npm` or `yarn` to package up JavaScript or CSS.
+# postBuildScript: yarn build
