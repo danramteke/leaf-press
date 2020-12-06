@@ -3,5 +3,3 @@ build/
 dist/
 *.xcodeproj
 .swiftpm
-LinuxMain.swift
-XCTestManifests.swift
