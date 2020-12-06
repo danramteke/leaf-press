@@ -23,9 +23,7 @@ extension Substring {
 extension String {
   var sha256: String {
     let digest = SHA256.hash(data: self.data(using: .utf8)!)
-    let string = digest.map { byte in
-      String(format: "%02x", byte)
-    }.joined()
-    return string
+
+    return digest.map { String(format: "%02x", $0) }.joined()
   }
 }
