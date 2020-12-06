@@ -20,7 +20,7 @@ class Renderer {
 
     let sources = LeafSources.init()
     try! sources.register(source: "in-memory", using: inMemory, searchable: true)
-    try! sources.register(source: "default", using: NIOLeafFiles(fileio: io, limits: NIOLeafFiles.Limit(rawValue: 0), sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
+    try! sources.register(source: "templates", using: NIOLeafFiles(fileio: io, limits: NIOLeafFiles.Limit(rawValue: 0), sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
 
     let leafRenderer = LeafRenderer(
       configuration: leafConfig,
@@ -120,7 +120,7 @@ class Renderer {
 
   private func contentFor(template: String, content: String) -> String {
     return """
-#extend("\(templateSlug)"):
+#extend("\(template)"):
 #export("content"):
 \(content)
 #endexport
