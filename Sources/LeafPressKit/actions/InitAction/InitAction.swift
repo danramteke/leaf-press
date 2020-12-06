@@ -8,10 +8,31 @@ public class InitAction {
     self.workDir = workDir
   }
 
-  public func scaffold() -> Result<[String], Error> {
-    return .success([])
-    // return Result {
-    //     Bundle.module.
-    // }
+  public func scaffold(dryRun: Bool) -> Result<[String], Error> {
+    return Result {
+      if !dryRun {
+        try workDir.mkpath()
+      }
+
+      let resourcePath = Path(Bundle.module.resourcePath!) + Path("scaffold")
+      let children = try resourcePath.recursiveChildren()
+      return try children.map { path in
+        let relativePath = path.relative(to: resourcePath)
+
+
+
+        let targetPath = workDir + relativePath
+        if !dryRun {
+          try path.copy(targetPath)
+        }
+
+        if targetPath.isDirectory {
+          return targetPath.relative(to: Path.current).string + "/"
+        } else {
+          return targetPath.relative(to: Path.current).string
+        }
+
+      }
+    }
   }
 }

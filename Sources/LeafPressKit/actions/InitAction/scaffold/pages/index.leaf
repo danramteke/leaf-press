@@ -1,0 +1,23 @@
+title: Home page
+---
+#extend("page.leaf"):
+#export("content"):
+
+<h1>Index</h1>
+
+<h2>Pages</h2>
+<ul>
+#for(page in website.pages):
+<li><a href="#(page.relativeURL)">#(page.title)</a></li>
+#endfor
+</ul>
+
+<h2>Posts</h2>
+<ul>
+#for(post in website.posts):
+<li><a href="#(post.relativeURL)">#(post.title)</a> - #(post.published)</li>
+#endfor
+</ul>
+
+#endexport
+#endextend
