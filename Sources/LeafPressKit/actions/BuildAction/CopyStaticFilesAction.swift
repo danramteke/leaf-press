@@ -17,7 +17,9 @@ public struct CopyStaticFilesAction {
 
   public func start() -> Result<Void, Swift.Error> {
     do {
-      if try Path(source).children().isEmpty {
+      let sourcePath = Path(source)
+      if try !sourcePath.exists || sourcePath.children().isEmpty {
+
         return .success(())
       }
     } catch {

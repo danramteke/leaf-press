@@ -20,7 +20,7 @@ final class InitCommand: Command {
       guard let workDir = signature.workDir else {
         return Path.current
       }
-      return Path(workDir)
+      return Path(workDir).normalize()
     }()
 
     let result = InitAction(workDir: workDir).scaffold(dryRun: signature.dryRun)

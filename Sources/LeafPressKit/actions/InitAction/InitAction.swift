@@ -23,10 +23,14 @@ public class InitAction {
 
         let targetPath = workDir + relativePath
         if !dryRun {
-          try path.copy(targetPath)
+          if path.isDirectory {
+            try targetPath.mkpath()
+          } else {
+            try path.copy(targetPath)
+          }
         }
 
-        if targetPath.isDirectory {
+        if path.isDirectory {
           return targetPath.relative(to: Path.current).string + "/"
         } else {
           return targetPath.relative(to: Path.current).string
