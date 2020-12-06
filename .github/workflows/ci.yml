@@ -32,8 +32,13 @@ jobs:
         name: Echo tags
         run: echo "${{ steps.docker_meta.outputs.tags }}"
 
-      - name: Install rsync
+      - name: Install rsync apt-get
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt-get install rsync
+
+      - name: Brew install rsync
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: brew install rsync
 
       - uses: fwal/setup-swift@v1
       - name: Get swift version
