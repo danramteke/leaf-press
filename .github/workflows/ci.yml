@@ -68,7 +68,7 @@ jobs:
 
       - 
         name: Ubuntu Test
-        run: test
+        run: swift test
       - 
         name: Ubuntu Build Release
-        run: build -c release
+        run: swift build -c release
