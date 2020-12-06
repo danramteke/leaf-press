@@ -19,8 +19,6 @@ public class InitAction {
       return try children.map { path in
         let relativePath = path.relative(to: resourcePath)
 
-
-
         let targetPath = workDir + relativePath
         if !dryRun {
           if path.isDirectory {
@@ -35,7 +33,6 @@ public class InitAction {
         } else {
           return targetPath.relative(to: Path.current).string
         }
-
       }
     }
   }
