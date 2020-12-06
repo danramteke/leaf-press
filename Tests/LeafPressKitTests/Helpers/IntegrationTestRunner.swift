@@ -19,7 +19,7 @@ struct IntegrationTestRunner {
 
     print("*** Building project to \(distDir.string)")
     print("*** View using")
-    print("*** docker run -p 8080:80 -v \(distDir.string)/:/usr/share/nginx/html/ nginx")
+    print("*** docker run -p 8080:80 -v `pwd`/\(distDir.string)/:/usr/share/nginx/html/ nginx")
 
     let config = Config(workDir: workDir,
                         distDir: distDir,

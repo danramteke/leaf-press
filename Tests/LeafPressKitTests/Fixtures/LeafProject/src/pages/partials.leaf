@@ -1,12 +1,13 @@
 sampleProperty: sampleValue
-title: Pure Leaf Template Sample
+title: Leaf Partials Demo
 ---
 #extend("page.leaf"):
 #export("content"):
-<h1>Sample Leaf Page</h1>
+<h1>Leaf Partials Demo Page</h1>
 
 #extend("image_with_caption.leaf"):
-#export("caption"): Caption 1 #endexport
+#export("image_src"):http://placekitten.com/g/200/200#endexport
+#export("caption"):Caption 1#endexport
 #endextend
 
 <p>Leaf templates are pure leaf! A <code>template</code> set in the front matter is undefined.

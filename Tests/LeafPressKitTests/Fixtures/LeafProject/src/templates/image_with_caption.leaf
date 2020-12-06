@@ -2,6 +2,9 @@
 <div>
 
 <div>
+<img src="#import("image_src")" />
+</div>
+<div>
 <b>#import("caption")</b>
 </div>
 
