@@ -14,7 +14,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/iwasrobbed/Down.git", from: "0.9.0"),
     .package(url: "https://github.com/vapor/leaf-kit.git", from: "1.0.0"),
-    // .package(url: "https://github.com/vapor/vapor.git", from: "4.5.0"),
+    .package(url: "https://github.com/apple/swift-crypto.git", from: "1.1.2"),
     .package(url: "https://github.com/vapor/console-kit.git", from: "4.2.4"),
     .package(url: "https://github.com/kylef/PathKit.git", from: "1.0.0"),
     .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
@@ -32,6 +32,7 @@ let package = Package(
               "Down",
               "PathKit",
               .product(name: "LeafKit", package: "leaf-kit"),
+              .product(name: "Crypto", package: "swift-crypto")
             ]),
     .testTarget(name: "LeafPressKitTests",
                 dependencies: [
