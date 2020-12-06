@@ -1,4 +1,5 @@
 FROM swift:5.3.1-focal as packages
+RUN apt-get update && apt-get -y install rsync && rm -rf /var/lib/apt/lists/*
 ADD ./Package.* ./
 RUN swift package resolve
 RUN mkdir -p Sources/LeafPressKit && touch Sources/LeafPressKit/empty.swift \
