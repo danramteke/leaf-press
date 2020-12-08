@@ -1,6 +1,7 @@
 import Foundation
 import PathKit
 import NIO
+import Yams
 
 protocol InputFileInitable {
   init?(config: Config, inputFile: InputFile)
@@ -40,7 +41,7 @@ extension InputFile {
   init(string: String, at fileLocation: FileLocation) {
     let lines = string.components(separatedBy: "\n")
 
-    if let idx = lines.firstIndex(of: "---") {
+    if let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) {
       let frontMatter = Dictionary<String, String>(uniqueKeysWithValues:
                                                     lines[lines.startIndex..<idx]
                                                     .compactMap { frontMatterLine in
