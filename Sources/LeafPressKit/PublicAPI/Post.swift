@@ -19,7 +19,7 @@ public struct Post: Codable, Renderable, Comparable, Equatable {
 
   public let publishedDate: Date
 
-  public let frontMatter: [String: String]
+  public let metadata: [String: String]
 
   let sha256: String
 }

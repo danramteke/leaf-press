@@ -9,7 +9,7 @@ protocol InputFileInitable {
 
 struct InputFile {
   let sha256: String
-  let frontMatter: [String: String]
+  let metadata: [String: String]
   let source: FileLocation
 
   var fileType: FileType {
@@ -21,19 +21,19 @@ struct InputFile {
   }
   
   var summary: String? {
-    frontMatter["summary"]
+    metadata["summary"]
   }
 
   var published: DateString? {
-    frontMatter["published"]?.dateString
+    metadata["published"]?.dateString
   }
 
   var title: String? {
-    frontMatter["title"]
+    metadata["title"]
   }
 
   var template: String? {
-    frontMatter["template"]
+    metadata["template"]
   }
 }
 
@@ -42,7 +42,7 @@ extension InputFile {
     let lines = string.components(separatedBy: "\n")
 
     if let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) {
-      let frontMatter = Dictionary<String, String>(uniqueKeysWithValues:
+      let metadata = Dictionary<String, String>(uniqueKeysWithValues:
                                                     lines[lines.startIndex..<idx]
                                                     .compactMap { frontMatterLine in
                                                       guard let colonIndex = frontMatterLine.firstIndex(of: ":") else {
@@ -55,9 +55,9 @@ extension InputFile {
                                                       return (key, val)
                                                     })
 
-      self.init(sha256: string.sha256, frontMatter: frontMatter, source: fileLocation)
+      self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
     } else {
-      self.init(sha256: string.sha256, frontMatter: [:], source: fileLocation)
+      self.init(sha256: string.sha256, metadata: [:], source: fileLocation)
     }
   }
   init(buffer: ByteBuffer, at fileLocation: FileLocation) {

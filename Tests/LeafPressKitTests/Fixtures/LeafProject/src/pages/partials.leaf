@@ -1,18 +1,24 @@
-sampleProperty: sampleValue
 title: Leaf Partials Demo
 ---
 #extend("page.leaf"):
 #export("content"):
 <h1>Leaf Partials Demo Page</h1>
 
+<p>Leaf templates are pure leaf! </p>
+
+<p>Here is an example of including a Rails-style "partial"</p>
+
 #extend("image_with_caption.leaf"):
 #export("image_src"):http://placekitten.com/g/200/200#endexport
 #export("caption"):Caption 1#endexport
 #endextend
 
-<p>Leaf templates are pure leaf! A <code>template</code> set in the front matter is undefined.
+<p>Partials can be included multiple times in the same document</p>
 
-<p>The front matter is passed into the template. Access the property with <code>current.frontMatter.sampleProperty</code>. For example, the sample property has a value of #(current.frontMatter.sampleProperty)</p>
+#extend("image_with_caption.leaf"):
+#export("caption"):Caption 2#endexport
+#export("image_src"):http://placekitten.com/g/100/100#endexport
+#endextend
 
 #endexport
 #endextend

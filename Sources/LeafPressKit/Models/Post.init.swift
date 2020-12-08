@@ -34,7 +34,7 @@ extension Post: InputFileInitable {
       target: target,
       relativeUrl: target.relativeURL,
       publishedDate: publishedDate,
-      frontMatter: inputFile.frontMatter,
+      metadata: inputFile.metadata,
       sha256: inputFile.sha256)
   }
 }

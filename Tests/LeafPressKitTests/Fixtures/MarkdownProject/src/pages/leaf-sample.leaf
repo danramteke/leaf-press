@@ -6,9 +6,10 @@ title: Pure Leaf Template Sample
 #export("content"):
 <h1>Sample Leaf Page</h1>
 
-<p>Leaf templates are pure leaf! A <code>template</code> set in the front matter is undefined.
+<p>Leaf templates are pure leaf!</p>
 
-<p>The front matter is passed into the template. Access the property with <code>current.frontMatter.sampleProperty</code>. For example, the sample property has a value of #(current.frontMatter.sampleProperty)</p>
+<p>The data at the top of the document is passed into the template. Access the property with <code>current.metadata.sampleProperty</code>.
+For example, the sample property has a value of #(current.metadata.sampleProperty)</p>
 
 #endexport
 #endextend
