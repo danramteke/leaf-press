@@ -39,40 +39,24 @@ struct InputFile {
 
 extension InputFile {
   init(string: String, at fileLocation: FileLocation) {
-    let lines = string.components(separatedBy: "\n")
+    let metadata: [String: String] = {
+      let lines = string.components(separatedBy: "\n")
 
-    if let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) {
+      guard let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) else {
+        return [:]
+      }
+
       let topOfDocument: String = lines[lines.startIndex..<idx].joined(separator: "\n")
-      let yaml: [String: String] = {
-        do {
-          return try Yams.load(yaml: topOfDocument) as? [String: String] ?? [:]
-        } catch {
-          return [:]
-        }
-      }()
 
-
-//      let metadata = Dictionary<String, String>(uniqueKeysWithValues:
-//                                                    lines[lines.startIndex..<idx]
-//                                                    .compactMap { frontMatterLine in
-//                                                      guard let colonIndex = frontMatterLine.firstIndex(of: ":") else {
-//                                                        return nil
-//                                                      }
-//                                                      let key = frontMatterLine[..<colonIndex].string
-//                                                      let val = frontMatterLine[frontMatterLine.index(colonIndex, offsetBy: 1)...]
-//                                                        .trimmingCharacters(in: .whitespaces)
-//
-//                                                      return (key, val)
-//                                                    })
-
-      self.init(sha256: string.sha256, metadata: yaml, source: fileLocation)
-    } else {
-      self.init(sha256: string.sha256, metadata: [:], source: fileLocation)
-    }
-  }
-
-  init(buffer: ByteBuffer, at fileLocation: FileLocation) {
-    self.init(string: String(buffer: buffer), at: fileLocation)
+      do {
+        let yaml: [String: String]? = try Yams.load(yaml: topOfDocument) as? [String: String]
+        return yaml ?? [:]
+      } catch {
+        print("Error parsing metadata for \(fileLocation.absolutePath)", error)
+        return [:]
+      }
+    }()
+    self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
   }
 }
 

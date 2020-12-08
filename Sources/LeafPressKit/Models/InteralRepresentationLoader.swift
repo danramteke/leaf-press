@@ -61,7 +61,7 @@ class InternalRepresentationLoader {
 
     return fileTree.fileLocations.map { (location) -> EventLoopFuture<InputFile> in
       location.read(with: io, on: eventLoop).map { (buffer) -> InputFile in
-        return InputFile(buffer: buffer, at: location)
+        return InputFile(string: String(buffer: buffer), at: location)
       }
     }
   }
