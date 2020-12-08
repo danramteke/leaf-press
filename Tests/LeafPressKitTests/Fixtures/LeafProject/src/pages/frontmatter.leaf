@@ -1,5 +1,19 @@
 sampleProperty: sampleValue
 title: Pure Leaf Template Sample
+simpleList:
+  - contains
+  - several
+  - items
+complexList:
+  - name: Turnip
+    width: 100
+    height: 200
+  - name: Pumpkin
+    width: 200
+    height: 100
+  - name: Yam
+    width: 50
+    height: 70
 ---
 #extend("page.leaf"):
 #export("content"):
@@ -11,5 +25,21 @@ title: Pure Leaf Template Sample
 Access the property with <code>current.metadata.sampleProperty</code>.
 For example, the sample property has a value of #(current.metadata.sampleProperty)</p>
 
+<p>in addition, full YAML is available. Here is the <code>simpleList</code> from above:</p>
+
+<ul>
+#for(item in current.metadata.simpleList):
+<li>#(item)</li>
+#endfor
+</ul>
+
+
+<p>Here is the <code>complex-list</code> from above:</p>
+
+<ul>
+#for(item in current.metadata.complexList):
+<li><b>#(item.name)</b> <img src="http://placekitten.com/g/#(item.width)/#(item.height)"/></li>
+#endfor
+</ul>
 #endexport
 #endextend

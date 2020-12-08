@@ -6,7 +6,7 @@ class IntegrationTests: XCTestCase {
   
   func testMarkdownProject() throws {
     let fixtureName = "MarkdownProject"
-    let expectedRoutes: Set<String>  = ["/posts/sample-post.html", "/posts/html-post.html", "/leaf-sample.html", "/frontmatter-template-sample.html", "/index.html", "/posts/sample-post-with-custom-template.html"]
+    let expectedRoutes: Set<String>  = ["/leaf-sample.html", "/posts/sample-post-with-custom-template.html", "/posts/html-post-with-custom-template.html", "/frontmatter-template-sample.html", "/index.html", "/posts/html-post.html", "/posts/sample-post.html"]
 
     try IntegrationTestRunner().run(fixtureName: fixtureName, expectedRoutes: expectedRoutes)
   }

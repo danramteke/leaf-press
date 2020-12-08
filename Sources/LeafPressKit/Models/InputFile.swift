@@ -50,21 +50,56 @@ extension InputFile {
       let topOfDocument: String = lines[lines.startIndex..<idx].joined(separator: "\n")
 
       do {
-        guard let yaml: [String: Any] = try Yams.load(yaml: topOfDocument) as? [String: Any] else {
+
+        guard let node: Node = try Yams.compose(yaml: topOfDocument) else {
           return [:]
         }
 
-        return yaml.compactMapValues({ (any) -> LeafData? in
-          (any as? LeafDataRepresentable)?.leafData
-        })
+        switch node {
 
+        case .scalar(let scaler):
+          print("got \(scaler), expected mapping")
+          return [:]
+        case .mapping(let mapping):
+          let pairs: [(String, LeafData)] = mapping.keys.map { (key) in
+            (key.string!, mapping[key]!.leafData)
+          }
+          return Dictionary(uniqueKeysWithValues: pairs)
+        case .sequence(let sequence):
+          print("got \(sequence), expected mapping")
+          return [:]
+        }
 
       } catch {
         print("Error parsing metadata for \(fileLocation.absolutePath)", error)
         return [:]
       }
     }()
+    print("***", fileLocation.relativePath)
+    print(metadata)
     self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
   }
 }
 
+extension Node: LeafDataRepresentable {
+  public var leafData: LeafData {
+    switch self {
+    case .scalar(let scaler):
+      return scaler.leafData
+    case .mapping(let mapping):
+      let pairs = mapping.keys.map { (key) in
+        (key.string!, mapping[key]!.leafData)
+      }
+      return Dictionary(uniqueKeysWithValues: pairs).leafData
+    case .sequence(let sequence):
+      return sequence.map({ $0.leafData }).leafData
+    }
+  }
+}
+
+
+extension Node.Scalar: LeafDataRepresentable {
+  public var leafData: LeafData {
+    self.string.leafData
+  }
+}
