@@ -19,7 +19,7 @@ struct InputFile {
   var slug: String {
     source.slug
   }
-  
+
   var summary: String? {
     metadata["summary"]
   }
@@ -42,24 +42,35 @@ extension InputFile {
     let lines = string.components(separatedBy: "\n")
 
     if let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) {
-      let metadata = Dictionary<String, String>(uniqueKeysWithValues:
-                                                    lines[lines.startIndex..<idx]
-                                                    .compactMap { frontMatterLine in
-                                                      guard let colonIndex = frontMatterLine.firstIndex(of: ":") else {
-                                                        return nil
-                                                      }
-                                                      let key = frontMatterLine[..<colonIndex].string
-                                                      let val = frontMatterLine[frontMatterLine.index(colonIndex, offsetBy: 1)...]
-                                                        .trimmingCharacters(in: .whitespaces)
+      let topOfDocument: String = lines[lines.startIndex..<idx].joined(separator: "\n")
+      let yaml: [String: String] = {
+        do {
+          return try Yams.load(yaml: topOfDocument) as? [String: String] ?? [:]
+        } catch {
+          return [:]
+        }
+      }()
 
-                                                      return (key, val)
-                                                    })
 
-      self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
+//      let metadata = Dictionary<String, String>(uniqueKeysWithValues:
+//                                                    lines[lines.startIndex..<idx]
+//                                                    .compactMap { frontMatterLine in
+//                                                      guard let colonIndex = frontMatterLine.firstIndex(of: ":") else {
+//                                                        return nil
+//                                                      }
+//                                                      let key = frontMatterLine[..<colonIndex].string
+//                                                      let val = frontMatterLine[frontMatterLine.index(colonIndex, offsetBy: 1)...]
+//                                                        .trimmingCharacters(in: .whitespaces)
+//
+//                                                      return (key, val)
+//                                                    })
+
+      self.init(sha256: string.sha256, metadata: yaml, source: fileLocation)
     } else {
       self.init(sha256: string.sha256, metadata: [:], source: fileLocation)
     }
   }
+
   init(buffer: ByteBuffer, at fileLocation: FileLocation) {
     self.init(string: String(buffer: buffer), at: fileLocation)
   }

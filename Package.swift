@@ -31,6 +31,7 @@ let package = Package(
             dependencies: [
               "Down",
               "PathKit",
+              "Yams",
               .product(name: "LeafKit", package: "leaf-kit"),
               .product(name: "Crypto", package: "swift-crypto"),
             ],
