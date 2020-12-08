@@ -2,6 +2,7 @@ import Foundation
 import PathKit
 import NIO
 import Yams
+import LeafKit
 
 protocol InputFileInitable {
   init?(config: Config, inputFile: InputFile)
@@ -9,7 +10,7 @@ protocol InputFileInitable {
 
 struct InputFile {
   let sha256: String
-  let metadata: [String: String]
+  let metadata: [String: LeafData]
   let source: FileLocation
 
   var fileType: FileType {
@@ -21,25 +22,25 @@ struct InputFile {
   }
 
   var summary: String? {
-    metadata["summary"]
+    metadata["summary"]?.string
   }
 
   var published: DateString? {
-    metadata["published"]?.dateString
+    metadata["published"]?.string?.dateString
   }
 
   var title: String? {
-    metadata["title"]
+    metadata["title"]?.string
   }
 
   var template: String? {
-    metadata["template"]
+    metadata["template"]?.string
   }
 }
 
 extension InputFile {
   init(string: String, at fileLocation: FileLocation) {
-    let metadata: [String: String] = {
+    let metadata: [String: LeafData] = {
       let lines = string.components(separatedBy: "\n")
 
       guard let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) else {
@@ -49,8 +50,15 @@ extension InputFile {
       let topOfDocument: String = lines[lines.startIndex..<idx].joined(separator: "\n")
 
       do {
-        let yaml: [String: String]? = try Yams.load(yaml: topOfDocument) as? [String: String]
-        return yaml ?? [:]
+        guard let yaml: [String: Any] = try Yams.load(yaml: topOfDocument) as? [String: Any] else {
+          return [:]
+        }
+
+        return yaml.compactMapValues({ (any) -> LeafData? in
+          (any as? LeafDataRepresentable)?.leafData
+        })
+
+
       } catch {
         print("Error parsing metadata for \(fileLocation.absolutePath)", error)
         return [:]

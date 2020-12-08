@@ -1,7 +1,8 @@
 import Foundation
 import PathKit
+import LeafKit
 
-public struct Page: Codable, Renderable {
+public struct Page: Renderable {
   public let template: String
 //  public typealias Id = Tagged<Page, String>
   public let slug: String
@@ -12,7 +13,7 @@ public struct Page: Codable, Renderable {
   public let target: FileLocation
   public let relativeUrl: URL
 
-  public let metadata: [String: String]
+  public let metadata: [String: LeafData]
 
   let sha256: String
 }

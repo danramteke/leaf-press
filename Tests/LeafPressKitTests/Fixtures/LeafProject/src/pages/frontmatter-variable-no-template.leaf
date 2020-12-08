@@ -7,7 +7,8 @@ title: Pure Leaf Template Sample - No Template
 <p>The front matter is passed into the template. Access the property with <code>current.metadata.sampleProperty</code>.
 For example, the sample property has a value of #(current.metadata.sampleProperty)</p>
 
-<div>Here is the full metadata: #(current.metadata)</div>
+<div>The title is also available. Either direcly <code>current.title</code>: #(current.title),
+or via the metadata: <code>current.metadata.title</code>: #(current.metadata.title)</div>
 
 <p>No template has been selected here</p>
 
