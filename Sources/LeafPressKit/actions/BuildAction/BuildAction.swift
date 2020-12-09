@@ -41,7 +41,7 @@ public class BuildAction {
       try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
         return InternalRepresentationLoader(config: config)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
-          .flatMap { (website) in
+          .flatMap { website, errors in
             return Renderer(config: self.config).render(website: website, in: threadPool, on: eventLoopGroup.next())
           }
       }

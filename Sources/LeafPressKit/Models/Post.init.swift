@@ -3,7 +3,7 @@ import Foundation
 import PathKit
 
 extension Post: InputFileInitable {
-  init?(config: Config, inputFile: InputFile) {
+  init(config: Config, inputFile: InputFile) throws {
     let directoryPath: Path = config.postsPublishPrefix + Path(inputFile.source.directoryPath)
 
     let target = FileLocation(
@@ -13,15 +13,11 @@ extension Post: InputFileInitable {
       fileType: .html)
 
     guard let published = inputFile.published else {
-      print("skipping \(inputFile.source.relativeURL.relativeString) - doesn't have published date")
-      // TODO: convert to throwing error
-      return nil
+      throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "doesn't have published date. Add a `published` field to the front matter of the post")
     }
 
     guard let publishedDate = config.date(from: published.rawValue) else {
-      print("skipping \(inputFile.source.relativeURL.relativeString) - couldn't parse date from \(published.rawValue)")
-      // TODO: convert to throwing error
-      return nil
+      throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "couldn't parse date from \(published.rawValue)")
     }
     
     self.init(
@@ -36,5 +32,10 @@ extension Post: InputFileInitable {
       publishedDate: publishedDate,
       metadata: inputFile.metadata,
       sha256: inputFile.sha256)
+  }
+
+  struct PageInitError: Error {
+    let path: String
+    let message: String
   }
 }

@@ -62,10 +62,10 @@ class Renderer {
         self.inMemory.register(content: content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
-          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
-            print(error)
-            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
-          })
+//          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
+//            print(error)
+//            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
+//          })
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
@@ -80,10 +80,10 @@ class Renderer {
         self.inMemory.register(content: inputFile.content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
-          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
-            print(error)
-            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
-          })
+//          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
+//            print(error)
+//            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
+//          })
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
@@ -101,11 +101,11 @@ class Renderer {
           self.inMemory.register(content: content, at: inputFile.sha256)
           return leafRenderer
             .render(path: inputFile.sha256, context: context)
-            .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
-              let string = "An error occurred rendering '\(renderable.source.slug)':\n\(error)"
-              print(string)
-              return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: string))
-            })
+//            .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
+//              let string = "An error occurred rendering '\(renderable.source.slug)':\n\(error)"
+//              print(string)
+//              return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: string))
+//            })
             .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
               self.inMemory.removeContent(at: inputFile.sha256)
               return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())

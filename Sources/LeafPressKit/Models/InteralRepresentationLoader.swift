@@ -1,6 +1,7 @@
 import Foundation
 import NIO
 import PathKit
+typealias WebsiteRenderResult = (Website, [Error])
 
 class InternalRepresentationLoader {
 
@@ -9,17 +10,40 @@ class InternalRepresentationLoader {
     self.config = config
   }
 
-  func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Website> {
 
-    let futurePages: EventLoopFuture<[Page]> = loadRenderablesAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
-    let futurePosts: EventLoopFuture<[Post]> = loadRenderablesAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
 
-    return futurePages.and(futurePosts).map { (pages, posts) -> Website in
-      Website(pages: pages, posts: posts)
+  func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<(Website, [Error])> {
+
+    let futurePages: EventLoopFuture<[Result<Page, Error>]> = loadRenderablesAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+    let futurePosts: EventLoopFuture<[Result<Post, Error>]> = loadRenderablesAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+
+    return futurePages.and(futurePosts).map { (pageResults, postResults) -> (Website, [Error]) in
+      var errors: [Error] = []
+      var pages: [Page] = []
+      var posts: [Post] = []
+      pageResults.forEach {
+        switch $0 {
+        case .failure(let error):
+          errors.append(error)
+        case .success(let page):
+          pages.append(page)
+        }
+      }
+
+      postResults.forEach {
+        switch $0 {
+        case .failure(let error):
+          errors.append(error)
+        case .success(let post):
+          posts.append(post)
+        }
+      }
+
+      return (Website(pages: pages, posts: posts), errors)
     }
   }
 
-  private func loadRenderablesAt<T: Renderable & InputFileInitable>(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[T]> {
+  private func loadRenderablesAt<T: Renderable & InputFileInitable>(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[Result<T, Error>]> {
     self.discoverFileTree(root: root, on: eventLoopGroup.next()).flatMap { tree in
       return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup.next())
     }
@@ -36,24 +60,17 @@ class InternalRepresentationLoader {
     return promise.futureResult
   }
 
-  private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<[T]> {
+  private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<[Result<T, Error>]> {
 
-    let files: [EventLoopFuture<T?>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoop).map { (inputFileFuture) in
-      inputFileFuture.map { (inputFile) -> (T?) in
-        T.init(config: self.config, inputFile: inputFile)
-      }
-    }
-
-    return EventLoopFuture<T?>.whenAllComplete(files, on: eventLoop).map { (results) -> [T] in
-      results.compactMap { (result) -> T? in
-        switch result {
-        case .success(let maybe): return maybe
-        case .failure(let error):
-          print("***", error)
-          return nil
+    let files: [EventLoopFuture<Result<T, Error>>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoop).map { (inputFileFuture) in
+      inputFileFuture.map { inputFile -> Result<T, Error> in
+        Result {
+          try T.init(config: self.config, inputFile: inputFile)
         }
       }
     }
+
+    return EventLoopFuture.whenAllComplete(files, on: eventLoop).map { $0.map { $0.flatMap { $0 } } }
   }
 
   private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> [EventLoopFuture<InputFile>] {

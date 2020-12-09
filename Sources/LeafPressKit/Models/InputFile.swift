@@ -5,7 +5,7 @@ import Yams
 import LeafKit
 
 protocol InputFileInitable {
-  init?(config: Config, inputFile: InputFile)
+  init(config: Config, inputFile: InputFile) throws
 }
 
 struct InputFile {
