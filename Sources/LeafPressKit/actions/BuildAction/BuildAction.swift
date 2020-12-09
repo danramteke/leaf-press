@@ -36,13 +36,15 @@ public class BuildAction {
       return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
   }
 
-  private func renderWebsite() -> Result<Void, Error> {
+  private func renderWebsite() -> Result<[Error], Error> {
     return Result {
       try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
         return InternalRepresentationLoader(config: config)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .flatMap { website, errors in
-            return Renderer(config: self.config).render(website: website, in: threadPool, on: eventLoopGroup.next())
+            return Renderer(config: self.config).render(website: website, in: threadPool, on: eventLoopGroup.next()).map { _ in
+              return errors
+            }
           }
       }
     }

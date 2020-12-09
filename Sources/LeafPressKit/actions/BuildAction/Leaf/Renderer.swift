@@ -19,8 +19,12 @@ class Renderer {
     let leafConfig = LeafConfiguration(rootDirectory: templatesDir)
 
     let sources = LeafSources.init()
-    try! sources.register(source: "in-memory", using: inMemory, searchable: true)
-    try! sources.register(source: "templates", using: NIOLeafFiles(fileio: io, limits: NIOLeafFiles.Limit(rawValue: 0), sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
+    do {
+      try sources.register(source: "in-memory", using: inMemory, searchable: true)
+      try sources.register(source: "templates", using: NIOLeafFiles(fileio: io, limits: NIOLeafFiles.Limit(rawValue: 0), sandboxDirectory: templatesDir, viewDirectory: templatesDir), searchable: true)
+    } catch {
+      return eventLoopGroup.next().makeFailedFuture(error)
+    }
 
     let leafRenderer = LeafRenderer(
       configuration: leafConfig,
@@ -38,18 +42,14 @@ class Renderer {
   }
 
   private func render(renderables: [Renderable], leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoopGroup: EventLoopGroup) -> [EventLoopFuture<Void>] {
-    return renderables.map { (r) -> EventLoopFuture<Void> in
+    return renderables.map { r -> EventLoopFuture<Void> in
       return self.render(renderable: r, leafRenderer: leafRenderer, website: website, with: io, on: eventLoopGroup)
     }
   }
 
-
-
   private func render(renderable: Renderable, leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Void> {
     renderable.source.read(with: io, on: eventLoopGroup.next()).flatMap { (buffer) -> EventLoopFuture<Void> in
       let inputFile = ContentInputFile(string: String(buffer: buffer))
-
-
 
       switch renderable.source.fileType {
       case .html:
@@ -62,10 +62,6 @@ class Renderer {
         self.inMemory.register(content: content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
-//          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
-//            print(error)
-//            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
-//          })
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
             self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
@@ -80,11 +76,7 @@ class Renderer {
         self.inMemory.register(content: inputFile.content, at: inputFile.sha256)
         return leafRenderer
           .render(path: inputFile.sha256, context: context)
-//          .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
-//            print(error)
-//            return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: "An error occurred rendering '\(renderable.source.slug)':\n\(error)"))
-//          })
-          .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+          .flatMap { renderedBuffer -> EventLoopFuture<Void> in
             self.inMemory.removeContent(at: inputFile.sha256)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
           }
@@ -101,12 +93,7 @@ class Renderer {
           self.inMemory.register(content: content, at: inputFile.sha256)
           return leafRenderer
             .render(path: inputFile.sha256, context: context)
-//            .flatMapError({ (error) -> EventLoopFuture<ByteBuffer> in
-//              let string = "An error occurred rendering '\(renderable.source.slug)':\n\(error)"
-//              print(string)
-//              return eventLoopGroup.next().makeSucceededFuture(ByteBuffer(string: string))
-//            })
-            .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
+            .flatMap { renderedBuffer -> EventLoopFuture<Void> in
               self.inMemory.removeContent(at: inputFile.sha256)
               return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
             }
