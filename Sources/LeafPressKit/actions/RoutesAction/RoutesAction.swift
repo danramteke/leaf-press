@@ -7,19 +7,25 @@ public class RoutesAction {
     self.config = config
   }
 
-  public func list() -> Result<[String], Error> {
+  public func list() -> Result<([String], [Error]), Error> {
 
     return Result {
 
-      try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) -> EventLoopFuture<[String]> in
+      try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) -> EventLoopFuture<([String], [Error])> in
         return InternalRepresentationLoader(config: config)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
-          .map { (website, errors) -> [String] in
-          website.pages.map({ $0.relativeUrl.path })
-          +
-          website.posts.map({ $0.relativeUrl.path })
+          .map { (website, errors) -> ([String], [Error]) in
+            (website.routes, errors)
         }
       }
     }
+  }
+
+
+}
+
+private extension Website {
+  var routes: [String] {
+    self.pages.map({ $0.relativeUrl.path }) + self.posts.map({ $0.relativeUrl.path })
   }
 }

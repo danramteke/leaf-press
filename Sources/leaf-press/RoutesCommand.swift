@@ -23,8 +23,18 @@ final class RoutesCommand: Command {
     let result = RoutesAction(config: signature.loadConfig(using: context)).list()
 
     switch result {
-    case .success(let routes):
-      context.console.output(routes.joined(separator: "\n").consoleText(.warning))
+    case .success(let success):
+      let errors = success.1
+      let routes = success.0
+      context.console.output(routes.joined(separator: "\n").consoleText(.info))
+      if !errors.isEmpty {
+        context.console.output("However, the following errors occured: ")
+        for (i, error) in errors.enumerated() {
+          context.console.info("\(i).")
+          context.console.error(error.localizedDescription)
+          context.console.error("")
+        }
+      }
     case .failure(let error):
       context.console.error(error.localizedDescription)
     }

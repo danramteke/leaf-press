@@ -34,8 +34,16 @@ final class BuildCommand: Command {
     switch result {
     case .failure(let error):
       context.console.output("\(error)".consoleText(.error))
-    case .success:
+    case .success(let errors):
       context.console.output("Done".consoleText(.success))
+      if !errors.isEmpty {
+        context.console.output("However, the following errors occured: ")
+        for (i, error) in errors.enumerated() {
+          context.console.info("\(i).")
+          context.console.error(error.localizedDescription)
+          context.console.error("")
+        }
+      }
     }
   }
 }

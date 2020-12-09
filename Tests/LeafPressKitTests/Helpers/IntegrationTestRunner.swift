@@ -43,8 +43,11 @@ struct IntegrationTestRunner {
     switch RoutesAction(config: config).list() {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
-    case .success(let routes):
+    case .success(let success):
+      let routes = success.0
+      let errors = success.1
       XCTAssertEqual(Set(routes), expectedRoutes)
+      XCTAssertEqual(errors.count, 0)
     }
 
     assertRoutesExist(routes: expectedRoutes, distDir: distDir)

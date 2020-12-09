@@ -7,8 +7,8 @@ public class BuildAction {
     self.config = config
   }
 
-  public func build(ignoreStatic: Bool) -> Result<Void, Error> {
-    Result<Void, Error>.success(())
+  public func build(ignoreStatic: Bool) -> Result<[Error], Error> {
+    Result<[Error], Error>.success([])
       .map { _ in
         CreateDirectoriesAction(config: config).start()
       }
@@ -22,12 +22,14 @@ public class BuildAction {
       .flatMap { _ in
         self.renderWebsite()
       }
-      .flatMap { _ in
+      .flatMap { errors in
         guard let script = config.postBuildScript else {
-          return .success(())
+          return .success([])
         }
 
-        return self.runPostBuild(script: script)
+        return self.runPostBuild(script: script).map { _  in
+          return errors
+        }
       }
   }
 
