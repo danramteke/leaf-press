@@ -14,7 +14,6 @@ protocol ConfigLoading {
 extension ConfigLoading {
   func loadConfig(using context: CommandContext) -> Config {
     let configFilePath = self.configFilePath ?? Config.defaultPath
-    context.console.output("using config at \(configFilePath)".consoleText(.info))
 
     let workDir: Path = {
       if let workDir = self.workDir {
@@ -24,7 +23,7 @@ extension ConfigLoading {
       }
     }()
 
-    context.console.output("using work dir of config \(workDir.string)".consoleText(.info))
+    context.console.output("using config at \(configFilePath), work dir at \(workDir.string)".consoleText(.info))
 
     let config: Config = {
       do {

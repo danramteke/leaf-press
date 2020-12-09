@@ -10,8 +10,6 @@ class InternalRepresentationLoader {
     self.config = config
   }
 
-
-
   func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<(Website, [Error])> {
 
     let futurePages: EventLoopFuture<[Result<Page, Error>]> = loadRenderablesAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)

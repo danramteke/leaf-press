@@ -1,5 +1,6 @@
 import Foundation
 import PathKit
+
 public struct Config {
   public let workDir: Path
   public let distDir: Path

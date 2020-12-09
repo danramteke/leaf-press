@@ -14,11 +14,9 @@ func go() {
   commands.use(InitCommand(), as: "init", isDefault: false)
   commands.use(RoutesCommand(), as: "routes", isDefault: false)
   commands.use(ServeCommand(), as: "serve", isDefault: false)
-  commands.use(TodayCommand(), as: "today", isDefault: false)
+  commands.use(NewCommand(), as: "new", isDefault: false)
+
   do {
-
-
-
     let group = commands
       .group(help: "LeafPress static site generator with Markdown and Leaf templates")
     try console.run(group, input: input)
