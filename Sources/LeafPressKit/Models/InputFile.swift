@@ -39,7 +39,7 @@ struct InputFile {
 }
 
 extension InputFile {
-  init(string: String, at fileLocation: FileLocation) {
+  init(string: String, at fileLocation: FileLocation) throws {
     let metadata: [String: LeafData] = {
       let lines = string.components(separatedBy: "\n")
 

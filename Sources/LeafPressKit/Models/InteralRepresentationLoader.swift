@@ -76,10 +76,18 @@ class InternalRepresentationLoader {
   private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> [EventLoopFuture<InputFile>] {
     let io = NonBlockingFileIO(threadPool: threadPool)
 
-    return fileTree.fileLocations.map { (location) -> EventLoopFuture<InputFile> in
-      location.read(with: io, on: eventLoop).map { (buffer) -> InputFile in
-        return InputFile(string: String(buffer: buffer), at: location)
+    return fileTree.fileLocations
+      .map { location -> EventLoopFuture<InputFile> in
+        return location
+          .read(with: io, on: eventLoop)
+          .flatMap { byteBuffer -> EventLoopFuture<InputFile> in
+            do {
+              let inputFile = try InputFile(string: String(buffer: byteBuffer), at: location)
+              return eventLoop.makeSucceededFuture(inputFile)
+            } catch {
+              return eventLoop.makeFailedFuture(error)
+            }
+          }
       }
-    }
   }
 }
