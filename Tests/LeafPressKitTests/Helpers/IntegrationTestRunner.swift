@@ -17,9 +17,7 @@ struct IntegrationTestRunner {
     if distDir.exists { try distDir.delete() }
     try distDir.mkpath()
 
-    print("*** Building project to \(distDir.string)")
-    print("*** View using")
-    print("*** docker run -p 8080:80 -v `pwd`/\(distDir.string)/:/usr/share/nginx/html/ nginx")
+    print("*** Building project to \(distDir.string), view using: docker run -p 8080:80 -v `pwd`/\(distDir.string)/:/usr/share/nginx/html/ nginx")
 
     let config = Config(workDir: workDir,
                         distDir: distDir,

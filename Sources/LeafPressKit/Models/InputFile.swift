@@ -75,8 +75,6 @@ extension InputFile {
         return [:]
       }
     }()
-    print("***", fileLocation.relativePath)
-    print(metadata)
     self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
   }
 }
