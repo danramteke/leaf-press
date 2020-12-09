@@ -45,7 +45,7 @@ class InternalRepresentationLoader {
 
   private func loadRenderablesAt<T: Renderable & InputFileInitable>(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[Result<T, Error>]> {
     self.discoverFileTree(root: root, on: eventLoopGroup.next()).flatMap { tree in
-      return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup.next())
+      return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup)
     }
   }
 
@@ -60,9 +60,9 @@ class InternalRepresentationLoader {
     return promise.futureResult
   }
 
-  private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> EventLoopFuture<[Result<T, Error>]> {
+  private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[Result<T, Error>]> {
 
-    let files: [EventLoopFuture<Result<T, Error>>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoop).map { (inputFileFuture) in
+    let files: [EventLoopFuture<Result<T, Error>>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoopGroup).map { (inputFileFuture) in
       inputFileFuture.map { inputFile -> Result<T, Error> in
         Result {
           try T.init(config: self.config, inputFile: inputFile)
@@ -70,22 +70,22 @@ class InternalRepresentationLoader {
       }
     }
 
-    return EventLoopFuture.whenAllComplete(files, on: eventLoop).map { $0.map { $0.flatMap { $0 } } }
+    return EventLoopFuture.whenAllComplete(files, on: eventLoopGroup.next()).map { $0.map { $0.flatMap { $0 } } }
   }
 
-  private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoop: EventLoop) -> [EventLoopFuture<InputFile>] {
+  private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> [EventLoopFuture<InputFile>] {
     let io = NonBlockingFileIO(threadPool: threadPool)
 
     return fileTree.fileLocations
       .map { location -> EventLoopFuture<InputFile> in
         return location
-          .read(with: io, on: eventLoop)
+          .read(with: io, on: eventLoopGroup.next())
           .flatMap { byteBuffer -> EventLoopFuture<InputFile> in
             do {
               let inputFile = try InputFile(string: String(buffer: byteBuffer), at: location)
-              return eventLoop.makeSucceededFuture(inputFile)
+              return eventLoopGroup.next().makeSucceededFuture(inputFile)
             } catch {
-              return eventLoop.makeFailedFuture(error)
+              return eventLoopGroup.next().makeFailedFuture(error)
             }
           }
       }
