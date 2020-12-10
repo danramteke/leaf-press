@@ -34,14 +34,20 @@ struct InputFile {
   }
 }
 
-enum FrontmatterYamlParseError: String, Error, LocalizedError {
-  case scalar, sequence
-  var errorDescription: String? { "Frontmatter should be a YAML dictionary, not a \(self.rawValue)" }
+enum FrontmatterYamlParseError: Error, LocalizedError {
+  case scalar, sequence, other(Error)
+  var errorDescription: String? {
+    switch self {
+    case .scalar: return "Frontmatter should be a YAML dictionary, not a scalar"
+    case .sequence: return "Frontmatter should be a YAML dictionary, not a sequence"
+    case .other(let error): return "Error parsing metadata in frontmatter. \(error)"
+    }
+  }
 }
 
 extension InputFile {
   init(string: String, at fileLocation: FileLocation) throws {
-    let metadata: [String: LeafData] = {
+    let metadata: [String: LeafData] = try {
       let lines = string.components(separatedBy: "\n")
 
       guard let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) else {
@@ -62,20 +68,16 @@ extension InputFile {
         case .sequence:
           throw FrontmatterYamlParseError.sequence
         case .mapping(let mapping):
-          let pairs: [(String, LeafData)] = try mapping.keys.map { (key) in
-            (key.string!, try mapping[key]!.leafData())
-          }
-          return Dictionary(uniqueKeysWithValues: pairs)
+          return try mapping.asStringsToLeafData()
         }
-
       } catch {
-        print("Error parsing metadata for \(fileLocation.absolutePath)", error)
-        return [:]
+        throw FrontmatterYamlParseError.other(error)
       }
     }()
     self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
   }
 }
+
 
 struct NonStringNodeKey: Error, LocalizedError {
   let errorDescription: String? = "Expect key of node to convert to a string easily"

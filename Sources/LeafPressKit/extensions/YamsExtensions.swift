@@ -8,16 +8,23 @@ extension Node {
     case .scalar(let scaler):
       return scaler.leafData
     case .mapping(let mapping):
-      let pairs: [(String, LeafData)] = try mapping.map { (key, value) in
-        guard let keyAsString = key.string else {
-          throw NonStringNodeKey()
-        }
-        return (keyAsString, try value.leafData())
-      }
-      return LeafData.dictionary(Dictionary(uniqueKeysWithValues: pairs))
+      return try LeafData.dictionary(mapping.asStringsToLeafData())
     case .sequence(let sequence):
       return try sequence.map({ try $0.leafData() }).leafData
     }
+  }
+}
+
+extension Node.Mapping {
+  func asStringsToLeafData() throws -> [String: LeafData] {
+    let pairs: [(String, LeafData)] = try self.map { (key, value) in
+      guard let keyAsString = key.string else {
+        throw NonStringNodeKey()
+      }
+      return (keyAsString, try value.leafData())
+    }
+
+    return Dictionary(uniqueKeysWithValues: pairs)
   }
 }
 
