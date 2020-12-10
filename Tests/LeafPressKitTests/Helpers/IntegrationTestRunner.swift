@@ -5,7 +5,7 @@ import LeafPressKit
 
 struct IntegrationTestRunner {
   func run(fixtureName: String, expectedRoutes: Set<String>) throws {
-    let tmpDir = Path("tmp/TestOutput")
+    let tmpDir = Path("/tmp/TestOutput")
     try tmpDir.mkpath()
 
     print(Bundle.module.resourcePath!)
@@ -17,7 +17,7 @@ struct IntegrationTestRunner {
     if distDir.exists { try distDir.delete() }
     try distDir.mkpath()
 
-    print("*** Building project to \(distDir.string), view using: docker run -p 8080:80 -v `pwd`/\(distDir.string)/:/usr/share/nginx/html/ nginx")
+    print("*** Building project to \(distDir.string), view using: docker run -p 8080:80 -v \(distDir.string)/:/usr/share/nginx/html/ nginx")
 
     let config = Config(workDir: workDir,
                         distDir: distDir,
