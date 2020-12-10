@@ -51,7 +51,7 @@ class Renderer {
     renderable.source.read(with: io, on: eventLoopGroup.next()).flatMap { (buffer) -> EventLoopFuture<Void> in
       let inputFile = ContentInputFile(string: String(buffer: buffer))
 
-      switch renderable.source.fileType {
+      switch renderable.source.supportedFileType {
       case .html:
         let context = [
           "current": renderable.leafData,
@@ -100,6 +100,9 @@ class Renderer {
         } catch {
           return eventLoopGroup.next().makeFailedFuture(error)
         }
+      case .none:
+        
+        return eventLoopGroup.next().makeFailedFuture(UnsupportedFileType(fileExtension: ""))
       }
     }
 

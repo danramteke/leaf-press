@@ -1,18 +1,51 @@
 import Foundation
 
-enum FileType: String, CaseIterable, Equatable, Hashable, Codable {
-  case md = ".md", leaf = ".leaf", html = ".html"
+struct FileType: Equatable, Hashable, Codable {
+  let rawValue: String
+//  case md, leaf, html, other(String), none
 
-  static let glob: String = "{*,**/*}.{md,html,leaf}"
+  static let glob: String = "{*,*/*,**/*}"
+
+  init(supportedFileType: SupportedFileType) {
+    self.rawValue = supportedFileType.rawValue
+  }
 
   init?(filename: String) {
-    let maybeFileType = FileType.allCases.first(where: { fileType in
-      filename.hasSuffix(fileType.rawValue)
-    })
-
-    guard let fileType = maybeFileType else {
+    guard !filename.isEmpty else {
       return nil
     }
-    self = fileType
+    guard let index = filename.firstIndex(of: ".") else {
+      return nil
+    }
+    self.rawValue = String(filename[filename.index(after: index)...])
+  }
+
+  var supportedFileType: SupportedFileType? {
+    SupportedFileType(rawValue: self.rawValue)
+  }
+
+  var dotted: String {
+    "." + rawValue
+  }
+
+
+}
+enum SupportedFileType: String, CaseIterable, Hashable {
+  case md = "md", html = "html", leaf = "leaf"
+}
+extension Optional where Wrapped == FileType {
+  var dotted: String {
+    switch self {
+    case .some(let fileType): return fileType.dotted
+    case .none: return ""
+    }
+  }
+}
+
+struct UnsupportedFileType: Error, LocalizedError {
+  let fileExtension: String
+
+  var errorDescription: String? {
+    self.fileExtension + "is not a supported file type."
   }
 }

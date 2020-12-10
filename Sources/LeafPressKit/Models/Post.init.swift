@@ -9,8 +9,9 @@ extension Post: InputFileInitable {
     let target = FileLocation(
       root: config.distDir.string,
       directoryPath: directoryPath.string,
+      rawFilename: inputFile.source.slug + "." + SupportedFileType.html.rawValue,
       slug: inputFile.source.slug,
-      fileType: .html)
+      fileExtension: SupportedFileType.html.rawValue)
 
     guard let published = inputFile.published else {
       throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "doesn't have published date. Add a `published` field to the front matter of the post")

@@ -13,10 +13,6 @@ struct InputFile {
   let metadata: [String: LeafData]
   let source: FileLocation
 
-  var fileType: FileType {
-    source.fileType
-  }
-
   var slug: String {
     source.slug
   }
