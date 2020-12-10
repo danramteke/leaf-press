@@ -4,7 +4,7 @@ import LeafKit
 
 public struct Post: Renderable, Comparable, Equatable {
   public static func < (lhs: Post, rhs: Post) -> Bool {
-    lhs.publishedDate < rhs.publishedDate
+    lhs.date < rhs.date
   }
 
   public let template: String
@@ -12,13 +12,13 @@ public struct Post: Renderable, Comparable, Equatable {
   public let title: String?
   public let summary: String?
   
-  public let published: DateString
+  public let dateString: DateString
 
   public let source: FileLocation
   public let target: FileLocation
   public let relativeUrl: URL
 
-  public let publishedDate: Date
+  public let date: Date
 
   public let metadata: [String: LeafData]
 
@@ -33,8 +33,8 @@ extension Post: LeafDataRepresentable {
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
       "relativeURL": self.relativeUrl.relativeString.leafData,
 
-      "published": self.published.rawValue.leafData,
-      "publishedDate": self.publishedDate.leafData,
+      "dateString": self.dateString.rawValue.leafData,
+      "date": self.date.leafData,
 
       "metadata": self.metadata.leafData,
 

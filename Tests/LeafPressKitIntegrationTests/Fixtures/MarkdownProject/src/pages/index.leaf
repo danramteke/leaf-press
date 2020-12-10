@@ -17,7 +17,7 @@ title: Index Sample
 <h2>Posts</h2>
 <ul>
 #for(post in website.posts):
-<li><a href="#(post.relativeURL)">#(post.title)</a> - #(post.published)</li>
+<li><a href="#(post.relativeURL)">#(post.title)</a> - #(post.dateString)</li>
 #endfor
 </ul>
 

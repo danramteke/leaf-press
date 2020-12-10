@@ -1,4 +1,4 @@
-published: June 1, 2020
+date: June 1, 2020
 template: custom.leaf
 title: Markdown Blog Post with custom Template
 ---

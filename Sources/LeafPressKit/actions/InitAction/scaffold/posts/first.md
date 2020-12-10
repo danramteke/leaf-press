@@ -1,4 +1,4 @@
-published: December 1, 2020
+date: December 1, 2020
 title: First Post
 ---
 # First Post

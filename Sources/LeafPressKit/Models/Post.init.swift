@@ -13,12 +13,12 @@ extension Post: InputFileInitable {
       slug: inputFile.source.slug,
       fileExtension: SupportedFileType.html.rawValue)
 
-    guard let published = inputFile.published else {
-      throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "doesn't have published date. Add a `published` field to the front matter of the post")
+    guard let dateString = inputFile.dateString else {
+      throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "doesn't have date. Add a `date` field to the front matter of the post")
     }
 
-    guard let publishedDate = config.date(from: published.rawValue) else {
-      throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "couldn't parse date from \(published.rawValue)")
+    guard let date = config.date(from: dateString.rawValue) else {
+      throw PageInitError(path: inputFile.source.relativeURL.relativeString, message: "couldn't parse date from \(dateString.rawValue)")
     }
     
     self.init(
@@ -26,11 +26,11 @@ extension Post: InputFileInitable {
       slug: inputFile.source.slug,
       title: inputFile.title,
       summary: inputFile.summary,
-      published: published,
+      dateString: dateString,
       source: inputFile.source,
       target: target,
       relativeUrl: target.relativeURL,
-      publishedDate: publishedDate,
+      date: date,
       metadata: inputFile.metadata,
       sha256: inputFile.sha256)
   }

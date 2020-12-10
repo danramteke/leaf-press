@@ -1,4 +1,4 @@
-published: November 1, 2020
+date: November 1, 2020
 title: Markdown Blog Post
 ---
 #  Markdown Blog Post

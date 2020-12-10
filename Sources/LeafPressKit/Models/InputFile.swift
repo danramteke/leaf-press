@@ -21,8 +21,8 @@ struct InputFile {
     metadata["summary"]?.string
   }
 
-  var published: DateString? {
-    metadata["published"]?.string?.dateString
+  var dateString: DateString? {
+    metadata["date"]?.string?.dateString
   }
 
   var title: String? {
