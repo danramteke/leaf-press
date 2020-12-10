@@ -38,6 +38,11 @@ struct InputFile {
   }
 }
 
+enum FrontmatterYamlParseError: String, Error, LocalizedError {
+  case scalar, sequence
+  var  errorDescription: String? { "Frontmatter should be a YAML dictionary, not a \(self.rawValue)" }
+}
+
 extension InputFile {
   init(string: String, at fileLocation: FileLocation) throws {
     let metadata: [String: LeafData] = {
@@ -56,18 +61,15 @@ extension InputFile {
         }
 
         switch node {
-
-        case .scalar(let scaler):
-          print("got \(scaler), expected mapping")
-          return [:]
+        case .scalar:
+          throw FrontmatterYamlParseError.scalar
+        case .sequence:
+          throw FrontmatterYamlParseError.sequence
         case .mapping(let mapping):
-          let pairs: [(String, LeafData)] = mapping.keys.map { (key) in
-            (key.string!, mapping[key]!.leafData)
+          let pairs: [(String, LeafData)] = try mapping.keys.map { (key) in
+            (key.string!, try mapping[key]!.leafData())
           }
           return Dictionary(uniqueKeysWithValues: pairs)
-        case .sequence(let sequence):
-          print("got \(sequence), expected mapping")
-          return [:]
         }
 
       } catch {
@@ -79,18 +81,25 @@ extension InputFile {
   }
 }
 
-extension Node: LeafDataRepresentable {
-  public var leafData: LeafData {
+struct NonStringNodeKey: Error, LocalizedError {
+  let errorDescription: String? = "Expect key of node to convert to a string easily"
+}
+
+extension Node {
+  public func leafData() throws -> LeafData {
     switch self {
     case .scalar(let scaler):
       return scaler.leafData
     case .mapping(let mapping):
-      let pairs = mapping.keys.map { (key) in
-        (key.string!, mapping[key]!.leafData)
+      let pairs: [(String, LeafData)] = try mapping.map { (key, value) in
+        guard let keyAsString = key.string else {
+          throw NonStringNodeKey()
+        }
+        return (keyAsString, try value.leafData())
       }
-      return Dictionary(uniqueKeysWithValues: pairs).leafData
+      return LeafData.dictionary(Dictionary(uniqueKeysWithValues: pairs))
     case .sequence(let sequence):
-      return sequence.map({ $0.leafData }).leafData
+      return try sequence.map({ try $0.leafData() }).leafData
     }
   }
 }
