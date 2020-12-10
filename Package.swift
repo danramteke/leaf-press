@@ -39,7 +39,7 @@ let package = Package(
                   .copy("actions/InitAction/scaffold")
                 ]
             ),
-    .testTarget(name: "LeafPressKitTests",
+    .testTarget(name: "LeafPressKitIntegrationTests",
                 dependencies: [
                   "LeafPressKit",
                   "PathKit"

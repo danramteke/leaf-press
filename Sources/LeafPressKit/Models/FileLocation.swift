@@ -60,4 +60,12 @@ public struct FileLocation: Hashable, Codable {
   var relativeURL: URL {
     URL(string: "/" + relativePath.string)!
   }
+
+  var datePrefix: String? {
+    guard let range = self.rawFilename.range(of: #"^\d\d\d\d-\d\d-\d\d-"#, options: .regularExpression) else {
+      return nil
+    }
+
+    return self.rawFilename[range].string
+  }
 }

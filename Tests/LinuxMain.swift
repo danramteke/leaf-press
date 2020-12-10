@@ -1,8 +1,8 @@
 import XCTest
 
-import LeafPressKitTests
+import LeafPressKitIntegrationTests
 
 var tests = [XCTestCaseEntry]()
-tests += LeafPressKitTests.__allTests()
+tests += LeafPressKitIntegrationTests.__allTests()
 
 XCTMain(tests)
