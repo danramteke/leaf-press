@@ -21,6 +21,5 @@ extension Path {
     meAbs.removeSubrange(...parentsAbs.endIndex)
 
     return Path(meAbs)
-
   }
 }

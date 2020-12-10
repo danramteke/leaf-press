@@ -35,10 +35,16 @@ let package = Package(
               .product(name: "LeafKit", package: "leaf-kit"),
               .product(name: "Crypto", package: "swift-crypto"),
             ],
-             resources: [
-                  .copy("actions/InitAction/scaffold")
+            resources: [
+              .copy("actions/InitAction/scaffold")
+            ]
+    ),
+    .testTarget(name: "LeafPressKitUnitTests",
+                dependencies: [
+                  "LeafPressKit",
+                  "PathKit"
                 ]
-            ),
+    ),
     .testTarget(name: "LeafPressKitIntegrationTests",
                 dependencies: [
                   "LeafPressKit",

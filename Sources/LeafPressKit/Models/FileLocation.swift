@@ -8,7 +8,6 @@ public struct FileLocation: Hashable, Codable {
   let rawFilename: String
   let slug: String // filename without extensions
   let fileExtension: String?
-//  let fileType: FileType?
 
   init(root: String, directoryPath: String, rawFilename: String, slug: String, fileExtension: String?) {
     self.root = root
@@ -62,10 +61,6 @@ public struct FileLocation: Hashable, Codable {
   }
 
   var datePrefix: String? {
-    guard let range = self.rawFilename.range(of: #"^\d\d\d\d-\d\d-\d\d-"#, options: .regularExpression) else {
-      return nil
-    }
-
-    return self.rawFilename[range].string
+    self.rawFilename.datePrefix
   }
 }

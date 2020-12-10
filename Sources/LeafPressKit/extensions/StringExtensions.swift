@@ -26,4 +26,12 @@ extension String {
 
     return digest.map { String(format: "%02x", $0) }.joined()
   }
+
+  var datePrefix: String? {
+    guard let range = self.range(of: #"^\d\d\d\d-\d\d-\d\d[-_]"#, options: .regularExpression) else {
+      return nil
+    }
+
+    return self[range.lowerBound..<self.index(before: range.upperBound)].string
+  }
 }

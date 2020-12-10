@@ -50,7 +50,7 @@ class InternalRepresentationLoader {
   private func discoverFileTree(root: Path, on eventLoop: EventLoop) -> EventLoopFuture<FileTree> {
     let promise = eventLoop.makePromise(of: FileTree.self)
     DispatchQueue.global().async {
-      let fileLocations = root.glob(FileType.glob).compactMap { (childPath) -> FileLocation? in
+      let fileLocations = root.glob("{*,*/*,**/*}").compactMap { (childPath) -> FileLocation? in
         FileLocation(path: childPath.absolute(), root: root)
       }
       promise.succeed(FileTree(fileLocations: fileLocations))
