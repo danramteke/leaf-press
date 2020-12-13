@@ -7,13 +7,13 @@ public class BuildAction {
     self.config = config
   }
 
-  public func build(ignoreStatic: Bool) -> Result<[Error], Error> {
+  public func build(skipStatic: Bool, skipScript: Bool) -> Result<[Error], Error> {
     Result<[Error], Error>.success([])
       .map { _ in
         CreateDirectoriesAction(config: config).start()
       }
       .flatMap { _ -> Result<Void, Error> in
-        if ignoreStatic {
+        if skipStatic {
           return Result<Void, Error>.success(())
         } else {
           return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
@@ -23,7 +23,7 @@ public class BuildAction {
         self.renderWebsite()
       }
       .flatMap { errors in
-        guard let script = config.postBuildScript else {
+        guard !skipScript, let script = config.postBuildScript else {
           return .success([])
         }
 

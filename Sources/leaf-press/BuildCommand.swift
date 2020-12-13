@@ -13,8 +13,11 @@ final class BuildCommand: Command {
     @Option(name: Strings.workDir.name, short: Strings.workDir.short, help: Strings.workDir.help)
     var workDir: String?
 
-    @Flag(name: "ignore-static", help: "Don't copy static files")
-    var ignoreStatic: Bool
+    @Flag(name: "skip-static", help: "Don't copy static files")
+    var skipStatic: Bool
+
+    @Flag(name: "skip-script", help: "Don't copy static files")
+    var skipScript: Bool
 
     @Flag(name: "watch", help: "Watch the paths and rebuild the site as its modified.")
     var watch: Bool
@@ -26,11 +29,15 @@ final class BuildCommand: Command {
 
     let config = signature.loadConfig(using: context)
 
-    if signature.ignoreStatic {
+    if signature.skipStatic {
       context.console.output("Skipping static files".consoleText(.info))
     }
 
-    let result = BuildAction(config: config).build(ignoreStatic: signature.ignoreStatic)
+    if signature.skipScript {
+      context.console.output("Skipping scripts".consoleText(.info))
+    }
+
+    let result = BuildAction(config: config).build(skipStatic: signature.skipStatic,  skipScript: signature.skipScript)
     switch result {
     case .failure(let error):
       context.console.output("\(error)".consoleText(.error))

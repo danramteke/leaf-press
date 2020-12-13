@@ -84,7 +84,7 @@ class Renderer {
 
       case .md:
         do {
-          let downContent = try Down(markdownString: inputFile.content).toHTML(.unsafe)
+          let downContent = try Down(markdownString: inputFile.content).toHTML()
           let context = [
             "current": renderable.leafData,
             "website": website.leafData,

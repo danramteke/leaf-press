@@ -30,7 +30,7 @@ struct IntegrationTestRunner {
                         publishedTimeStyle: nil,
                         postBuildScript: nil)
 
-    let buildActionResult = BuildAction(config: config).build(ignoreStatic: false)
+    let buildActionResult = BuildAction(config: config).build(skipStatic: false, skipScript: true)
 
     switch buildActionResult {
     case .failure(let error):
