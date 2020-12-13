@@ -2,14 +2,30 @@ name: ci
 
 on:
   push:
-    tags: releases/[1-9]+.[0-9]+.[0-9]+
     branches: '**'
     pull_request:
 
 jobs:
+  once:
+    name: Create single release for all builds
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create a release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
   main:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    needs: once
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -32,6 +48,7 @@ jobs:
 
       - 
         name: Test
+        if: startsWith( github.ref, 'refs/tags/releases/') != true
         run: swift test
       - 
         name: Build Release
@@ -50,21 +67,11 @@ jobs:
           path: ${{ steps.release_info.outputs.BIN_PATH }}
       - name: Archive Test Artifacts
         uses: actions/upload-artifact@v2
+        if: startsWith( github.ref, 'refs/tags/releases/') != true
         with:
           name: Test Artifacts ${{ matrix.os }}
           path: /tmp/TestOutput     
 
-      - name: Create Release
-        id: create_release
-        if: startsWith( github.ref, 'refs/tags/releases/')
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
       - name: Upload Release Asset
         id: upload-release-asset 
         if: startsWith( github.ref, 'refs/tags/releases/')
