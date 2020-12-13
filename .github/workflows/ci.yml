@@ -2,12 +2,9 @@ name: ci
 
 on:
   push:
-    branches:
-      - '**'
-    tags:
-      - '*.*.*'
-  pull_request:
-    
+    tags: releases/[1-9]+.[0-9]+.[0-9]+
+    branches: '**'
+    pull_request:
 
 jobs:
   main:
@@ -20,17 +17,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          images: danramteke/leaf-press 
-          tag-sha: true 
-          tag-semver: true
-      -
-        name: Echo tags
-        run: echo "${{ steps.docker_meta.outputs.tags }}"
 
       - name: Install rsync apt-get
         if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -56,12 +42,6 @@ jobs:
         id: release_info
         run: |
           echo "::set-output name=BIN_PATH::$(swift build -c release --show-bin-path)/leaf-press"
-          if [ "main" == "$GITHUB_REF" ]; then
-            CI_COMMIT_REF_NAME="sha-$GITHUB_SHA"
-          else 
-            CI_COMMIT_REF_NAME="$GITHUB_REF"
-          fi
-          echo "::set-output name=RELEASE_NAME::$CI_COMMIT_REF_NAME"
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
@@ -73,3 +53,26 @@ jobs:
         with:
           name: Test Artifacts ${{ matrix.os }}
           path: /tmp/TestOutput     
+
+      - name: Create Release
+        id: create_release
+        if: startsWith( github.ref, 'refs/tags/releases/')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        if: startsWith( github.ref, 'refs/tags/releases/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.release_info.outputs.BIN_PATH }}
+          asset_name: leaf-press-${{ matrix.os }}
+          asset_content_type: application/octet-stream
