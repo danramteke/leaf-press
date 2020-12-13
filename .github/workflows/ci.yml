@@ -2,6 +2,7 @@ name: ci
 
 on:
   push:
+    tags: releases/[1-9]+.[0-9]+.[0-9]+
     branches: '**'
     pull_request:
 
@@ -14,6 +15,7 @@ jobs:
     steps:
       - name: Create a release
         id: create_release
+        if: startsWith( github.ref, 'refs/tags/releases/') 
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
