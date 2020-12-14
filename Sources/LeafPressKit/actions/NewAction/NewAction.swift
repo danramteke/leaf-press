@@ -27,6 +27,7 @@ public class NewAction {
 
   func newContent(dateString: String) -> String {
     """
+    ---
     title: New Post on \(dateString)
     date: \(dateString)
     ---
