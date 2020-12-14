@@ -5,7 +5,7 @@ import PathKit
 
 class FileLocationTests: XCTestCase {
   func testPageInFolder() {
-    let fileLocation = FileLocation(path: "folder/page.md", root: "pages")
+    let fileLocation = FileLocation(path: "folder/page.md", root: "/private/tmp/pages")
     XCTAssertNil(fileLocation.datePrefix)
     XCTAssertEqual(fileLocation.directoryPath, "folder/")
     XCTAssertEqual(fileLocation.fileExtension, "md")
@@ -17,7 +17,7 @@ class FileLocationTests: XCTestCase {
   }
 
   func testPage() {
-    let fileLocation = FileLocation(path: "page.md", root: "pages")
+    let fileLocation = FileLocation(path: "page.md", root: "/private/tmp/pages")
     XCTAssertNil(fileLocation.datePrefix)
     XCTAssertEqual(fileLocation.directoryPath, "")
     XCTAssertEqual(fileLocation.fileExtension, "md")
@@ -29,7 +29,7 @@ class FileLocationTests: XCTestCase {
   }
 
   func testUnsupported() {
-    let fileLocation = FileLocation(path: "unsupported.asdf", root: "pages")
+    let fileLocation = FileLocation(path: "unsupported.asdf", root: "/private/tmp/pages")
     XCTAssertNil(fileLocation.datePrefix)
     XCTAssertEqual(fileLocation.directoryPath, "")
     XCTAssertEqual(fileLocation.fileExtension, "asdf")
@@ -41,7 +41,7 @@ class FileLocationTests: XCTestCase {
   }
 
   func testNoExtension() {
-    let fileLocation = FileLocation(path: "no-extension", root: "pages")
+    let fileLocation = FileLocation(path: "no-extension", root: "/private/tmp/pages")
     XCTAssertNil(fileLocation.datePrefix)
     XCTAssertEqual(fileLocation.directoryPath, "")
     XCTAssertEqual(fileLocation.fileExtension, nil)
