@@ -9,7 +9,7 @@ public struct Post: Renderable, Comparable, Equatable {
 
   public let template: String
   public let slug: String
-  public let title: String?
+  public let title: String
   public let summary: String?
   
   public let dateString: DateString
@@ -28,7 +28,7 @@ extension Post: LeafDataRepresentable {
   public var leafData: LeafData {
     let dict: [String: LeafData] = [
       "slug": self.slug.leafData,
-      "title": self.title?.leafData ?? LeafData.nil(.string),
+      "title": self.title.leafData,
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
       "relativeURL": self.relativeUrl.relativeString.leafData,
 
