@@ -56,11 +56,22 @@ After the binary is installed locally, `leaf-press init` will scaffold a fresh w
 
 After making changes, run `leaf-press build`
 
+To scaffold a new blog post, with today's date as the default, run `leaf-press new`
+
 Although `leaf-press serve` isn't implemented yet, it prints out a [docker](https://www.docker.com) command pointed at your current output directory.
 
 LeafPress is built on [Leaf](https://github.com/vapor/leaf.git), [Vapor](https://github.com/vapor/vapor.git)'s templating engine. Here is the [Leaf documentionation](https://docs.vapor.codes/4.0/leaf/overview/).
 
 ## Config options
+
+Configuration is stored in `leaf-press.yml`. 
+
+- `distDir`: path to output dir, relative to `leaf-press.yml`
+- `postsPublishPrefix`: prefix for blog posts. For example if you want them to render to a `posts` folder or a `blog` folder
+- `pagesDir`: path to pages directory, relative to `leaf-press.yml`. Pages are standalone pages on the website
+- `postsDir`: path to posts directory, relative to `leaf-press.yml`. Posts need to have a date, and are considered chronological.
+- `staticFilesDir`: path to static files. These are copied into the output directory without any processing. Useful for images, or for other assets that don't need processing.
+- `templatesDir`: path to templates
 
 - `postBuildScript` can be used to run minification or CSS helpers. 
 
