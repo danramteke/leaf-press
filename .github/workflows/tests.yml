@@ -9,7 +9,6 @@ jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: once
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
