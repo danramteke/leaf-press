@@ -14,8 +14,6 @@ public struct Page: Renderable {
 
   public let metadata: [String: LeafData]
   public let isIncluded: Bool
-
-  let sha256: String
 }
 extension Page: LeafDataRepresentable {
 

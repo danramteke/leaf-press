@@ -9,7 +9,6 @@ protocol InputFileInitable {
 }
 
 struct InputFile {
-  let sha256: String
   let metadata: [String: LeafData]
   let source: FileLocation
 
@@ -97,7 +96,7 @@ extension InputFile {
         throw FrontmatterYamlParseError.other(error)
       }
     }()
-    self.init(sha256: string.sha256, metadata: metadata, source: fileLocation)
+    self.init(metadata: metadata, source: fileLocation)
   }
 }
 

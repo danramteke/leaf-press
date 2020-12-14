@@ -31,8 +31,7 @@ extension Post: InputFileInitable {
       relativeUrl: target.relativeURL,
       date: date,
       metadata: inputFile.metadata,
-      isIncluded: inputFile.isIncluded,
-      sha256: inputFile.sha256)
+      isIncluded: inputFile.isIncluded)
   }
 
   struct PageInitError: Error {

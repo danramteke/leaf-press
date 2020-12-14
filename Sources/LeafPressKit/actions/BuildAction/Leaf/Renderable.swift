@@ -7,5 +7,4 @@ protocol Renderable {
   var leafData: LeafData { get }
 
   var template: String { get }
-  var sha256: String { get }
 }

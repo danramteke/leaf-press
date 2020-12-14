@@ -1,11 +1,9 @@
 import Foundation
 
 struct ContentInputFile {
-  let sha256: String
   let content: String
 
   init(string: String) {
-    self.sha256 = string.sha256
     let pattern: String = #"---\n(.+)---\n(.+)$"#
     let regex = try! NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
     let nsrange = NSRange(string.startIndex..<string.endIndex, in: string)

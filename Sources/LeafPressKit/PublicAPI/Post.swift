@@ -22,8 +22,6 @@ public struct Post: Renderable, Comparable, Equatable {
 
   public let metadata: [String: LeafData]
   public let isIncluded: Bool
-
-  let sha256: String
 }
 
 extension Post: LeafDataRepresentable {

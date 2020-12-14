@@ -1,6 +1,5 @@
 
 import Foundation
-import Crypto
 
 extension String {
   public func removing(suffix: String) -> String? {
@@ -12,20 +11,6 @@ extension String {
       return nil
     }
   }
-}
-
-extension Substring {
-  var string: String {
-    String(self)
-  }
-}
-
-extension String {
-  var sha256: String {
-    let digest = SHA256.hash(data: self.data(using: .utf8)!)
-
-    return digest.map { String(format: "%02x", $0) }.joined()
-  }
 
   var datePrefix: String? {
     guard let range = self.range(of: #"^\d\d\d\d-\d\d-\d\d[-_]"#, options: .regularExpression) else {
@@ -33,5 +18,11 @@ extension String {
     }
 
     return self[range.lowerBound..<self.index(before: range.upperBound)].string
+  }
+}
+
+extension Substring {
+  var string: String {
+    String(self)
   }
 }
