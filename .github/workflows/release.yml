@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    tags: releases/[0-9]+.[0-9]+.[0-9]+
+    tags: release/[0-9]+.[0-9]+.[0-9]+
 
 jobs:
   create_github_release:
@@ -13,7 +13,6 @@ jobs:
     steps:
       - name: Create a release
         id: create_release
-        if: startsWith( github.ref, 'refs/tags/releases/') 
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +23,7 @@ jobs:
           prerelease: false
 
   build:
-    name: Build Relase for ${{ matrix.os }}
+    name: Build Release for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     needs: create_github_release
     strategy:
@@ -49,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_github_release.outputs.upload_url }}
           asset_path: ${{ steps.release_info.outputs.BIN_PATH }}
           asset_name: leaf-press-${{ matrix.os }}
           asset_content_type: application/octet-stream
