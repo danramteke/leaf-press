@@ -43,6 +43,10 @@ struct InputFile {
   var template: String? {
     metadata["template"]?.string
   }
+
+  var category: String? {
+    metadata["category"]?.string
+  }
 }
 
 enum FrontmatterYamlParseError: Error, LocalizedError {

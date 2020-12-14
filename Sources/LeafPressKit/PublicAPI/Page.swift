@@ -14,11 +14,9 @@ public struct Page: Renderable {
 
   public let metadata: [String: LeafData]
   public let isIncluded: Bool
+  public let category: String?
 }
 extension Page: LeafDataRepresentable {
-
-  
-
   public var leafData: LeafData {
     let dict: [String: LeafData] = [
       "slug": self.slug.leafData,
@@ -26,6 +24,7 @@ extension Page: LeafDataRepresentable {
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
       "relativeURL": self.relativeUrl.relativeString.leafData,
       "metadata": self.metadata.leafData,
+      "category": self.category?.leafData ?? LeafData.nil(.string)
     ]
     return dict.leafData
   }
