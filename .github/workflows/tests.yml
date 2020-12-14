@@ -5,7 +5,7 @@ on:
     branches: '**'
     pull_request:
 
-  main:
+  build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     needs: once
