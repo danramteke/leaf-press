@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
   name: "leaf-press",
   platforms: [
-    .macOS(.v11),
+    .macOS("10.15.4"),
   ],
   products: [
     .executable(name: "leaf-press", targets: ["leaf-press"]),
