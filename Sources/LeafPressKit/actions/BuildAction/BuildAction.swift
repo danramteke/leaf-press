@@ -7,7 +7,7 @@ public class BuildAction {
     self.config = config
   }
 
-  public func build(skipStatic: Bool, skipScript: Bool) -> Result<[Error], Error> {
+  public func build(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
     Result<[Error], Error>.success([])
       .map { _ in
         CreateDirectoriesAction(config: config).start()
@@ -20,7 +20,7 @@ public class BuildAction {
         }
       }
       .flatMap { _ in
-        self.renderWebsite()
+        self.renderWebsite(includeDrafts: includeDrafts)
       }
       .flatMap { errors in
         guard !skipScript, let script = config.postBuildScript else {
@@ -38,10 +38,10 @@ public class BuildAction {
       return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
   }
 
-  private func renderWebsite() -> Result<[Error], Error> {
+  private func renderWebsite(includeDrafts: Bool) -> Result<[Error], Error> {
     return Result {
       try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
-        return InternalRepresentationLoader(config: config)
+        return InternalRepresentationLoader(config: config, includeDrafts: includeDrafts)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .flatMap { website, errors in
             return Renderer(config: self.config).render(website: website, in: threadPool, on: eventLoopGroup.next()).map { _ in

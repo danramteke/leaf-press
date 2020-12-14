@@ -21,6 +21,7 @@ public struct Post: Renderable, Comparable, Equatable {
   public let date: Date
 
   public let metadata: [String: LeafData]
+  public let isIncluded: Bool
 
   let sha256: String
 }

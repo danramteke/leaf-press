@@ -17,6 +17,18 @@ struct InputFile {
     source.slug
   }
 
+  var isIncluded: Bool {
+    guard let draftString = metadata["draft"]?.string else {
+      return true
+    }
+
+    guard let isDraft = Bool(draftString) else {
+      return false
+    }
+
+    return !isDraft
+  }
+
   var summary: String? {
     metadata["summary"]?.string
   }

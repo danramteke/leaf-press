@@ -6,8 +6,10 @@ typealias WebsiteRenderResult = (Website, [Error])
 class InternalRepresentationLoader {
 
   let config: Config
-  init(config: Config) {
+  let includeDrafts: Bool
+  init(config: Config, includeDrafts: Bool) {
     self.config = config
+    self.includeDrafts = includeDrafts
   }
 
   func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<(Website, [Error])> {
@@ -19,12 +21,15 @@ class InternalRepresentationLoader {
       var errors: [Error] = []
       var pages: [Page] = []
       var posts: [Post] = []
+
       pageResults.forEach {
         switch $0 {
         case .failure(let error):
           errors.append(error)
         case .success(let page):
-          pages.append(page)
+          if page.isIncluded || self.includeDrafts {
+            pages.append(page)
+          }
         }
       }
 
@@ -33,7 +38,9 @@ class InternalRepresentationLoader {
         case .failure(let error):
           errors.append(error)
         case .success(let post):
-          posts.append(post)
+          if post.isIncluded || self.includeDrafts {
+            posts.append(post)
+          }
         }
       }
 

@@ -19,6 +19,7 @@ extension Page: InputFileInitable {
       target: target,
       relativeUrl: target.relativeURL,
       metadata: inputFile.metadata,
+      isIncluded: inputFile.isIncluded,
       sha256: inputFile.sha256)
   }
 }

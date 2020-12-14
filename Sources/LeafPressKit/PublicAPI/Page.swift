@@ -13,6 +13,7 @@ public struct Page: Renderable {
   public let relativeUrl: URL
 
   public let metadata: [String: LeafData]
+  public let isIncluded: Bool
 
   let sha256: String
 }

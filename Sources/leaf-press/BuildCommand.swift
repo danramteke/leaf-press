@@ -21,6 +21,9 @@ final class BuildCommand: Command {
 
     @Flag(name: "watch", help: "Watch the paths and rebuild the site as its modified.")
     var watch: Bool
+
+    @Flag(name: "include-drafts", help: "Include routes to drafts")
+    var includeDrafts: Bool
   }
 
   let help: String = "Build website"
@@ -37,7 +40,7 @@ final class BuildCommand: Command {
       context.console.output("Skipping scripts".consoleText(.info))
     }
 
-    let result = BuildAction(config: config).build(skipStatic: signature.skipStatic,  skipScript: signature.skipScript)
+    let result = BuildAction(config: config).build(skipStatic: signature.skipStatic,  skipScript: signature.skipScript, includeDrafts: signature.includeDrafts)
     switch result {
     case .failure(let error):
       context.console.output("\(error)".consoleText(.error))

@@ -30,7 +30,7 @@ struct IntegrationTestRunner {
                         publishedTimeStyle: nil,
                         postBuildScript: nil)
 
-    let buildActionResult = BuildAction(config: config).build(skipStatic: false, skipScript: true)
+    let buildActionResult = BuildAction(config: config).build(skipStatic: false, skipScript: true, includeDrafts: false)
 
     switch buildActionResult {
     case .failure(let error):
@@ -40,7 +40,7 @@ struct IntegrationTestRunner {
     }
 
 
-    switch RoutesAction(config: config).list() {
+    switch RoutesAction(config: config).list(includeDrafts: false) {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
     case .success(let success):

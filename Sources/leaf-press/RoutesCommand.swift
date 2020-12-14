@@ -11,6 +11,9 @@ final class RoutesCommand: Command {
 
     @Flag(name: "include-static", short: "s", help: "Include routes to static files")
     var includeStatic: Bool
+
+    @Flag(name: "include-drafts", help: "Include routes to drafts")
+    var includeDrafts: Bool
   }
 
   let help: String = "List all routes currently available, if built now."
@@ -20,7 +23,7 @@ final class RoutesCommand: Command {
       context.console.output("including routes to static files".consoleText(.info))
     }
     
-    let result = RoutesAction(config: signature.loadConfig(using: context)).list()
+    let result = RoutesAction(config: signature.loadConfig(using: context)).list(includeDrafts: signature.includeDrafts)
 
     switch result {
     case .success(let success):
