@@ -59,11 +59,11 @@ class Renderer {
         ]
 
         let content = self.contentFor(template: renderable.template, content: inputFile.content)
-        self.inMemory.register(content: content, at: inputFile.sha256)
+        self.inMemory.register(content: content, at: renderable.source.relativePath.string)
         return leafRenderer
-          .render(path: inputFile.sha256, context: context)
+          .render(path: renderable.source.relativePath.string, context: context)
           .flatMap { (renderedBuffer) -> EventLoopFuture<Void> in
-            self.inMemory.removeContent(at: inputFile.sha256)
+            self.inMemory.removeContent(at: renderable.source.relativePath.string)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
           }
 
@@ -73,11 +73,11 @@ class Renderer {
           "website": website.leafData,
         ]
 
-        self.inMemory.register(content: inputFile.content, at: inputFile.sha256)
+        self.inMemory.register(content: inputFile.content, at: renderable.source.relativePath.string)
         return leafRenderer
-          .render(path: inputFile.sha256, context: context)
+          .render(path: renderable.source.relativePath.string, context: context)
           .flatMap { renderedBuffer -> EventLoopFuture<Void> in
-            self.inMemory.removeContent(at: inputFile.sha256)
+            self.inMemory.removeContent(at: renderable.source.relativePath.string)
             return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
           }
 
@@ -90,11 +90,11 @@ class Renderer {
             "website": website.leafData,
           ]
           let content = self.contentFor(template: renderable.template, content: downContent)
-          self.inMemory.register(content: content, at: inputFile.sha256)
+          self.inMemory.register(content: content, at: renderable.source.relativePath.string)
           return leafRenderer
-            .render(path: inputFile.sha256, context: context)
+            .render(path: renderable.source.relativePath.string, context: context)
             .flatMap { renderedBuffer -> EventLoopFuture<Void> in
-              self.inMemory.removeContent(at: inputFile.sha256)
+              self.inMemory.removeContent(at: renderable.source.relativePath.string)
               return renderable.target.write(buffer: renderedBuffer, with: io, on: eventLoopGroup.next())
             }
         } catch {
