@@ -1,3 +1,4 @@
+---
 title: Extend a template manually, using leaf
 ---
 #extend("page.leaf"):

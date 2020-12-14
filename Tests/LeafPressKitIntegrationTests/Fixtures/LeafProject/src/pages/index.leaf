@@ -1,3 +1,4 @@
+---
 title: Site map
 ---
 #extend("page.leaf"):

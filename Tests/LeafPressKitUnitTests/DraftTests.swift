@@ -6,9 +6,10 @@ import XCTest
 class DraftTests: XCTestCase {
   func testNotDraft() throws {
     let string = """
+    ---
     title: Hello
     draft: false
-    ----
+    ---
     # Hello world
 
     How are you?
@@ -18,9 +19,10 @@ class DraftTests: XCTestCase {
 
   func testDraft() throws {
     let string = """
+    ---
     title: Hello
     draft: true
-    ----
+    ---
     # Hello world
 
     How are you?
@@ -30,9 +32,10 @@ class DraftTests: XCTestCase {
 
   func testUnparsebleDraftIsStillConsideredDraft() throws {
     let string = """
+    ---
     title: Hello
     draft: unparsable
-    ----
+    ---
     # Hello world
 
     How are you?
@@ -42,8 +45,9 @@ class DraftTests: XCTestCase {
 
   func testMissingDraftIsNotConsideredDraft() throws {
     let string = """
+    ---
     title: Hello
-    ----
+    ---
     # Hello world
 
     How are you?

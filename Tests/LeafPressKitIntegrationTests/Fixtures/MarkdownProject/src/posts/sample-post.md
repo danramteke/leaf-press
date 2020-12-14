@@ -1,3 +1,4 @@
+---
 date: November 1, 2020
 title: Markdown Blog Post
 ---

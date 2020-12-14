@@ -37,8 +37,8 @@ struct InputFile {
     metadata["date"]?.string?.dateString
   }
 
-  var title: String? {
-    metadata["title"]?.string
+  var title: String {
+    metadata["title"]?.string ?? "Untitled"
   }
 
   var template: String? {
@@ -60,17 +60,28 @@ enum FrontmatterYamlParseError: Error, LocalizedError {
 extension InputFile {
   init(string: String, at fileLocation: FileLocation) throws {
     let metadata: [String: LeafData] = try {
-      let lines = string.components(separatedBy: "\n")
+      let pattern: String = #"---\n(.+)---\n(.+)$"#
+      let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+      let nsrange = NSRange(string.startIndex..<string.endIndex, in: string)
 
-      guard let idx = lines.firstIndex(where: { $0.hasPrefix("---") }) else {
+      guard let matchRange = regex.firstMatch(in: string, options: [], range: nsrange)?.range(at: 1) else {
         return [:]
       }
 
-      let topOfDocument: String = lines[lines.startIndex..<idx].joined(separator: "\n")
+      guard matchRange.location != NSNotFound else {
+        return [:]
+      }
+
+      guard let yamlRange = Range(matchRange, in: string) else {
+        return [:]
+      }
+
+
+      let yamlDocument: String = string[yamlRange].string
 
       do {
 
-        guard let node: Node = try Yams.compose(yaml: topOfDocument) else {
+        guard let node: Node = try Yams.compose(yaml: yamlDocument) else {
           return [:]
         }
 

@@ -1,3 +1,4 @@
+---
 template: custom.leaf
 title: Custom Template Sample
 ---
