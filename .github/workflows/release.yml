@@ -28,32 +28,33 @@ jobs:
     needs: create_github_release
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11.0, macos-10.15]
+        include:
+          - os: macos-11.0
+            BUILD_CMD: swift build -c release
+          - os: macos-10.15
+            BUILD_CMD: swift build -c release
+          - os: ubuntu-20.04
+            BUILD_CMD: swift build -c release -Xswiftc -static-executable 
+
     steps:
       - uses: actions/checkout@v2
       - uses: fwal/setup-swift@v1
-      - name: Get swift version
+      - 
+        name: Swift version confirm
         run: swift --version 
       - 
-        name: Build Release Mac
-        if: startsWith(matrix.os, 'macOS')
-        run: swift build 
+        name: Build
+        run: "${{ matrix.BUILD_CMD }}"
       - 
-        name: Build Release Linux
-        if: startsWith(matrix.os, 'macOS') != true
-        run: swift build -Xswiftc -static-executable -c release 
+        name: Package
+        run: tar czf release.tgz -C $(${{ matrix.BUILD_CMD }} --show-bin-path) leaf-press
       - 
-        name: Release Info
-        id: release_info
-        run: |
-          echo "::set-output name=BIN_PATH::$(swift build -c release --show-bin-path)/leaf-press"
-      - name: Upload Release Asset
-        id: upload-release-asset 
+        name: Upload  
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_github_release.outputs.upload_url }}
-          asset_path: ${{ steps.release_info.outputs.BIN_PATH }}
-          asset_name: leaf-press-${{ matrix.os }}
+          asset_path: release.tgz
+          asset_name: leaf-press-${{ matrix.os }}.tgz
           asset_content_type: application/octet-stream
