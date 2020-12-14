@@ -36,7 +36,7 @@ jobs:
         run: swift --version 
       - 
         name: Build Release
-        run: swift build -c release
+        run: swift build -Xswiftc -static-executable -c release 
       - 
         name: Release Info
         id: release_info

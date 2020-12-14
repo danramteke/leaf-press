@@ -29,6 +29,9 @@ jobs:
       - name: Get swift version
         run: swift --version 
 
+      - name: confirm build in release configuration
+        run: swift build -Xswiftc -static-executable -c release 
+
       - name: Test
         run: swift test
 
