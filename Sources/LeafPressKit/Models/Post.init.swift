@@ -9,7 +9,6 @@ extension Post: InputFileInitable {
     let target = FileLocation(
       root: config.distDir.string,
       directoryPath: directoryPath.string,
-      rawFilename: inputFile.source.slug + "." + SupportedFileType.html.rawValue,
       slug: inputFile.source.slug,
       fileExtension: SupportedFileType.html.rawValue)
 

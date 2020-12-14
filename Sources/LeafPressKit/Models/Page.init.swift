@@ -6,7 +6,6 @@ extension Page: InputFileInitable {
     let target = FileLocation(
       root: config.distDir.string,
       directoryPath: inputFile.source.directoryPath,
-      rawFilename: inputFile.source.slug + "." + SupportedFileType.html.rawValue,
       slug: inputFile.source.slug,
       fileExtension: SupportedFileType.html.rawValue)
 

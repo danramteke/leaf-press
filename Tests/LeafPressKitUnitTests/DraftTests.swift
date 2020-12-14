@@ -56,6 +56,6 @@ class DraftTests: XCTestCase {
   }
 
   private func markdownInputFile(string: String) throws -> InputFile {
-    return try InputFile(string: string, at: FileLocation(root: "", directoryPath: "", rawFilename: "rawFilename.md", slug: "rawFilename", fileExtension: "md"))
+    return try InputFile(string: string, at: FileLocation(root: "", directoryPath: "", slug: "rawFilename", fileExtension: "md"))
   }
 }
