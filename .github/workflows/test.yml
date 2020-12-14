@@ -30,6 +30,7 @@ jobs:
         run: swift --version 
 
       - name: confirm build in release configuration
+        if: startsWith(matrix.os, 'macOS') != true
         run: swift build -Xswiftc -static-executable -c release 
 
       - name: Test

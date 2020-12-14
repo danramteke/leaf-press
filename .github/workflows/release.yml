@@ -35,7 +35,11 @@ jobs:
       - name: Get swift version
         run: swift --version 
       - 
-        name: Build Release
+        name: Build Release Mac
+        if: startsWith(matrix.os, 'macOS')
+        run: swift build 
+      name: Build Release Linux
+        if: startsWith(matrix.os, 'macOS') != true
         run: swift build -Xswiftc -static-executable -c release 
       - 
         name: Release Info
