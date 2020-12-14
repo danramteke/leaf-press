@@ -5,6 +5,7 @@ on:
     branches: '**'
     pull_request:
 
+jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
