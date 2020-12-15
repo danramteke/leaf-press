@@ -14,6 +14,6 @@ final class ServeCommand: Command {
   func run(using context: CommandContext, signature: Signature) throws {
     let config = signature.loadConfig(using: context)
     context.console.output("Not yet implemented. For now use:".consoleText(.warning))
-    context.console.output("docker run -p 8080:80 -v \(config.distDir.string):/usr/share/nginx/html/ nginx".consoleText(.info))
+    context.console.output("docker run -p 8080:80 -v \(config.distDir.absolute().string):/usr/share/nginx/html/ nginx".consoleText(.info))
   }
 }
