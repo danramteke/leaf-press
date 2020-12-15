@@ -25,21 +25,21 @@ mint run danramteke/leaf-press leaf-press build
 Statically linked binary. Known to work on Debian and Ubuntu
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.7/leaf-press-ubuntu-20.04.tgz | tar xzf -
+curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.10/leaf-press-ubuntu-20.04.tgz | tar xzf -
 ./leaf-press build
 ```
 
 #### macOS Big Sur
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.7/leaf-press-macos-11.0.tgz | tar xzf -
+curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.10/leaf-press-macos-11.0.tgz | tar xzf -
 ./leaf-press build
 ```
 
 #### macOS Catalina
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.7/leaf-press-macos-10.15.tgz | tar xzf -
+curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.10/leaf-press-macos-10.15.tgz | tar xzf -
 ./leaf-press build
 ```
 
@@ -47,7 +47,13 @@ curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.7/leaf-pr
 
 ```
 git clone https://github.com/danramteke/leaf-press.git && cd leaf-press
-swift build 
+swift run leaf-press build 
+```
+
+### Docker
+
+```
+docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.10 build
 ```
 
 ## Getting Started
@@ -85,4 +91,9 @@ GitLab Pages:
 
 ## Development Setup
 
-After cloning the repo, generate an Xcode project with `swift package generate-xcodeproj`
+After cloning the repo, generate an Xcode project with `swift package generate-xcodeproj`. When adding or removing tests, remember to run `swift test --generate-linuxmain` before committing and pushing your changes.
+
+### Branching Strategy
+
+- **main** is the mainline branch. May be unstable.
+- **x.x.x** tags are releases. Creating a tag will trigger a release build in github actions and on dockerhub.
