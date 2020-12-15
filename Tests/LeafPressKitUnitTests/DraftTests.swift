@@ -55,7 +55,7 @@ class DraftTests: XCTestCase {
     XCTAssertTrue(try self.markdownInputFile(string: string).isIncluded)
   }
 
-  private func markdownInputFile(string: String) throws -> InputFile {
-    return try InputFile(string: string, at: FileLocation(root: "", directoryPath: "", slug: "testFilename", fileExtension: "md"))
+  private func markdownInputFile(string: String) throws -> InputFileMetadata {
+    return try InputFileMetadata(string: string, at: FileLocation(root: "", directoryPath: "", slug: "testFilename", fileExtension: "md"))
   }
 }

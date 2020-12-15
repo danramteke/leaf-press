@@ -78,16 +78,16 @@ class InternalRepresentationLoader {
     return EventLoopFuture.whenAllComplete(files, on: eventLoopGroup.next()).map { $0.map { $0.flatMap { $0 } } }
   }
 
-  private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> [EventLoopFuture<InputFile>] {
+  private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> [EventLoopFuture<InputFileMetadata>] {
     let io = NonBlockingFileIO(threadPool: threadPool)
 
     return fileTree.fileLocations
-      .map { location -> EventLoopFuture<InputFile> in
+      .map { location -> EventLoopFuture<InputFileMetadata> in
         return location
           .read(with: io, on: eventLoopGroup.next())
-          .flatMap { byteBuffer -> EventLoopFuture<InputFile> in
+          .flatMap { byteBuffer -> EventLoopFuture<InputFileMetadata> in
             do {
-              let inputFile = try InputFile(string: String(buffer: byteBuffer), at: location)
+              let inputFile = try InputFileMetadata(string: String(buffer: byteBuffer), at: location)
               return eventLoopGroup.next().makeSucceededFuture(inputFile)
             } catch {
               return eventLoopGroup.next().makeFailedFuture(error)

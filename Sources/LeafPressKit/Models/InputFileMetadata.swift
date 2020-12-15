@@ -2,10 +2,10 @@ import Foundation
 import LeafKit
 
 protocol InputFileInitable {
-  init(config: Config, inputFile: InputFile) throws
+  init(config: Config, inputFile: InputFileMetadata) throws
 }
 
-struct InputFile {
+struct InputFileMetadata {
   let metadata: [String: LeafData]
   let source: FileLocation
 
@@ -46,7 +46,7 @@ struct InputFile {
   }
 }
 
-extension InputFile {
+extension InputFileMetadata {
   init(string: String, at fileLocation: FileLocation) throws {
     let metadata = try InputFileParser().metadata(from: string)
     self.init(metadata: metadata, source: fileLocation)

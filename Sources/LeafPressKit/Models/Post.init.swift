@@ -3,7 +3,7 @@ import Foundation
 import PathKit
 
 extension Post: InputFileInitable {
-  init(config: Config, inputFile: InputFile) throws {
+  init(config: Config, inputFile: InputFileMetadata) throws {
     let directoryPath: Path = config.postsPublishPrefix + Path(inputFile.source.directoryPath)
 
     let target = FileLocation(

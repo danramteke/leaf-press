@@ -2,7 +2,7 @@ import Foundation
 import NIO
 
 extension Page: InputFileInitable {
-  init(config: Config, inputFile: InputFile) {
+  init(config: Config, inputFile: InputFileMetadata) {
     let target = FileLocation(
       root: config.distDir.string,
       directoryPath: inputFile.source.directoryPath,
