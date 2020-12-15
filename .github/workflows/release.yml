@@ -53,7 +53,7 @@ jobs:
         run: "${{ matrix.BUILD_CMD }}"
       - 
         name: Package
-        run: tar czf release.tgz -C $(${{ matrix.BUILD_CMD }} --show-bin-path) leaf-press {{ matrix.RESOURCES }}
+        run: tar czf release.tgz -C $(${{ matrix.BUILD_CMD }} --show-bin-path) leaf-press ${{ matrix.RESOURCES }}
       - 
         name: Upload  
         uses: actions/upload-release-asset@v1
