@@ -9,7 +9,10 @@ Static site generator based on Vapor's [Leaf](https://github.com/vapor/leaf-kit.
 Statically linked binary. Known to work on Debian and Ubuntu
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.14/leaf-press-ubuntu-20.04.tgz | tar xzf -C /usr/local/bin -
+cd /usr/local/bin \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.14/leaf-press-ubuntu-20.04.tgz | tar xzf - \
+&& cd -
+
 leaf-press init
 leaf-press build
 ```
@@ -17,7 +20,10 @@ leaf-press build
 ### macOS Big Sur
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.14/leaf-press-macos-11.0.tgz | tar xzf -C /usr/local/bin -
+cd /usr/local/bin \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.14/leaf-press-macos-11.0.tgz | tar xzf - \
+&& cd -
+
 leaf-press init
 leaf-press build
 ```
@@ -25,7 +31,10 @@ leaf-press build
 ### macOS Catalina
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.14/leaf-press-macos-10.15.tgz | tar xzf -C /usr/local/bin -
+cd /usr/local/bin \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.14/leaf-press-macos-10.15.tgz | tar xzf -
+&& cd -
+
 leaf-press init
 leaf-press build
 ```
@@ -33,7 +42,9 @@ leaf-press build
 ### Build from source
 
 ```
-git clone https://github.com/danramteke/leaf-press.git && cd leaf-press
+git clone https://github.com/danramteke/leaf-press.git 
+cd leaf-press
+
 swift run leaf-press init 
 swift run leaf-press build 
 ```

@@ -10,15 +10,15 @@ class InputFileParser {
     let nsrange = NSRange(string.startIndex..<string.endIndex, in: string)
 
     guard let matchRange = regex.firstMatch(in: string, options: [], range: nsrange)?.range(at: 2) else {
-      return ""
+      return string
     }
 
     guard matchRange.location != NSNotFound else {
-      return ""
+      return string
     }
 
     guard let contentRange = Range(matchRange, in: string) else {
-      return ""
+      return string
     }
 
     return string[contentRange].string
