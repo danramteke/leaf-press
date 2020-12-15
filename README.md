@@ -46,16 +46,16 @@ docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.12 leaf-press build
 
 ### Mint
 
+Currently having an issue with resources in Mint, so `init` command may not work. The `build` command works fine.
+
 ```
 mint install danramteke/leaf-press
-leaf-press init # currently having an issue with resources in Mint
 leaf-press build
 ```
 
 or
 
 ```
-mint run danramteke/leaf-press leaf-press init
 mint run danramteke/leaf-press leaf-press build
 ```
 

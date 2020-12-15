@@ -1,7 +1,6 @@
 import Foundation
 import PathKit
 
-
 public struct FileLocation: Hashable, Codable {
   let root: String
   let directoryPath: String // relative path from root to file
@@ -75,7 +74,7 @@ public struct FileLocation: Hashable, Codable {
     URL(string: "/" + relativePath.string)!
   }
 
-  var datePrefix: String? {
-    self.rawFilename.datePrefix
+  var datePrefix: DatePrefix? {
+    DatePrefix(filename: rawFilename)
   }
 }

@@ -12,8 +12,6 @@ public struct Post: Renderable, Comparable, Equatable {
   public let title: String
   public let summary: String?
   
-  public let dateString: DateString
-
   public let source: FileLocation
   public let target: FileLocation
   public let relativeUrl: URL
@@ -32,7 +30,6 @@ extension Post: LeafDataRepresentable {
       "summary": self.summary?.leafData ?? LeafData.nil(.string),
       "relativeURL": self.relativeUrl.relativeString.leafData,
 
-      "dateString": self.dateString.rawValue.leafData,
       "date": self.date.leafData,
 
       "metadata": self.metadata.leafData,
