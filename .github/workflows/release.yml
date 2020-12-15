@@ -43,6 +43,9 @@ jobs:
         name: Swift version confirm
         run: swift --version 
       - 
+        name: Version
+        run: echo ${{ github.ref }} > Sources/leaf-press/version.txt
+      - 
         name: Build
         run: "${{ matrix.BUILD_CMD }}"
       - 

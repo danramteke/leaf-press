@@ -26,6 +26,9 @@ let package = Package(
               "Yams",
               .target(name: "LeafPressKit"),
               .product(name: "ConsoleKit", package: "console-kit"),
+            ],
+            resources: [
+              .copy("version/version.txt")
             ]),
     .target(name: "LeafPressKit", 
             dependencies: [

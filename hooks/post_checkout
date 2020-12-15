@@ -1,0 +1,5 @@
+#!/bin/bash
+echo $DOCKER_TAG > Sources/leaf-press/version/version.txt
+
+# Docker hub hooks script
+# See: https://docs.docker.com/docker-hub/builds/advanced/

@@ -8,8 +8,7 @@ func go() {
 //  let context = CommandContext(console: console, input: input)
 
   var commands = Commands(enableAutocomplete: true)
-
-  commands.use(BuildCommand(), as: "build", isDefault: true)
+  commands.use(BuildCommand(), as: "build", isDefault: false)
   commands.use(CleanCommand(), as: "clean", isDefault: false)
   commands.use(InitCommand(), as: "init", isDefault: false)
   commands.use(RoutesCommand(), as: "routes", isDefault: false)
@@ -18,9 +17,9 @@ func go() {
 
   do {
     let group = commands
-      .group(help: "LeafPress static site generator with Markdown and Leaf templates")
+      .group(help: "LeafPress \(Version())\nA static site generator with Markdown and Leaf templates.\n©2020 Daniel Ramteke, MIT License\nhttps://github.com/danramteke/leaf-press.git")
     try console.run(group, input: input)
-  } catch let error {
+  } catch {
     console.error("\(error)")
     exit(1)
   }
