@@ -1,5 +1,6 @@
 #!/bin/bash
-echo $DOCKER_TAG > Sources/leaf-press/version/version.txt
+
+echo "let version = \"$DOCKER_TAG\"" > Sources/leaf-press/version/version.swift
 
 # Docker hub hooks script
 # See: https://docs.docker.com/docker-hub/builds/advanced/

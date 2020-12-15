@@ -44,7 +44,7 @@ jobs:
         run: swift --version 
       - 
         name: Version
-        run: echo ${{ github.ref }} > Sources/leaf-press/version.txt
+        run: echo "let version = \"${{ github.ref }}\"" > Sources/leaf-press/version/version.swift
       - 
         name: Build
         run: "${{ matrix.BUILD_CMD }}"
