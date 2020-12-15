@@ -1,10 +1,11 @@
 import Foundation
 import PathKit
 
-public struct FileLocation: Hashable, Codable {
+public struct FileLocation: Hashable {
   let root: String
   let directoryPath: String // relative path from root to file
   let rawFilename: String
+  let datePrefix: DatePrefix?
   let slug: String // filename without extensions
   let fileExtension: String?
 
@@ -16,7 +17,7 @@ public struct FileLocation: Hashable, Codable {
         return slug
       }
     }()
-    self.init(root: root, directoryPath: directoryPath, rawFilename: rawFilename, slug: slug, fileExtension: fileExtension)
+    self.init(root: root, directoryPath: directoryPath, rawFilename: rawFilename, datePrefix: nil, slug: slug, fileExtension: fileExtension)
   }
 
   init(root: String, directoryPath: String, filename: String) {
@@ -26,16 +27,24 @@ public struct FileLocation: Hashable, Codable {
       let slug: String = filename[..<index].string
       let fileExtension: String = filename[filename.index(after: index)...].string
 
-      self.init(root: root, directoryPath: directoryPath, rawFilename: filename, slug: slug, fileExtension: fileExtension)
+      if let datePrefix = DatePrefix(filename: slug) {
+        let slug = slug[datePrefix.originalRange.upperBound...].string
+        self.init(root: root, directoryPath: directoryPath, rawFilename: filename, datePrefix: datePrefix, slug: slug, fileExtension: fileExtension)
+      } else {
+        self.init(root: root, directoryPath: directoryPath, rawFilename: filename, datePrefix: nil, slug: slug, fileExtension: fileExtension)
+      }
+
+
     } else {
-      self.init(root: root, directoryPath: directoryPath, rawFilename: filename, slug: filename, fileExtension: nil)
+      self.init(root: root, directoryPath: directoryPath, rawFilename: filename, datePrefix: nil, slug: filename, fileExtension: nil)
     }
   }
 
-  private init(root: String, directoryPath: String, rawFilename: String, slug: String, fileExtension: String?) {
+  private init(root: String, directoryPath: String, rawFilename: String, datePrefix: DatePrefix?, slug: String, fileExtension: String?) {
     self.root = root
     self.directoryPath = directoryPath
     self.rawFilename = rawFilename
+    self.datePrefix = datePrefix
     self.slug = slug
     self.fileExtension = fileExtension
   }
@@ -72,9 +81,5 @@ public struct FileLocation: Hashable, Codable {
 
   var relativeURL: URL {
     URL(string: "/" + relativePath.string)!
-  }
-
-  var datePrefix: DatePrefix? {
-    DatePrefix(filename: rawFilename)
   }
 }

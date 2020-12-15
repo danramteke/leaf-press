@@ -3,8 +3,8 @@ import PathKit
 import XCTest
 
 func assertDirectoriesMatch(expectedDir: Path, actualDir: Path, file: StaticString = #file, line: UInt = #line) throws {
-  try expectedDir.glob("{*,**/*}.*").forEach { expectedPath in
-
+  try expectedDir.recursiveChildren().forEach { expectedPath in
+    if expectedPath.isDirectory { return }
     let relativePath = expectedPath.relative(to: expectedDir)
 
     let expectedContents: Data = try expectedPath.read()

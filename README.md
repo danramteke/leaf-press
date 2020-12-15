@@ -87,10 +87,13 @@ Configuration is stored in `leaf-press.yml`.
 
 ## Example Projects
 
-GitLab Pages: 
+### GitLab Pages: 
 
-- Repo: <https://gitlab.com/daniel-delicious/daniel-delicious.gitlab.io>
-- Website: <https://daniel-delicious.gitlab.io>
+- Daniel Delicious: [GitLab Repo](https://gitlab.com/daniel-delicious/daniel-delicious.gitlab.io) [Website](https://daniel-delicious.gitlab.io)
+
+### GitHub Pages:
+
+None yet
 
 ## Development Setup
 

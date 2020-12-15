@@ -4,7 +4,7 @@ import LeafKit
 
 public struct Post: Renderable, Comparable, Equatable {
   public static func < (lhs: Post, rhs: Post) -> Bool {
-    lhs.date < rhs.date
+    lhs.date > rhs.date
   }
 
   public let template: String
