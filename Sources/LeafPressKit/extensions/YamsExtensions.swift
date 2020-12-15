@@ -19,7 +19,7 @@ extension Node.Mapping {
   func asStringsToLeafData() throws -> [String: LeafData] {
     let pairs: [(String, LeafData)] = try self.map { (key, value) in
       guard let keyAsString = key.string else {
-        throw NonStringNodeKey()
+        throw FrontmatterYamlParseError.nonStringNodeKey
       }
       return (keyAsString, try value.leafData())
     }

@@ -49,7 +49,7 @@ class Renderer {
 
   private func render(renderable: Renderable, leafRenderer: LeafRenderer, website: Website, with io: NonBlockingFileIO, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<Void> {
     renderable.source.read(with: io, on: eventLoopGroup.next()).flatMap { (buffer) -> EventLoopFuture<Void> in
-      let inputFile = ContentInputFile(string: String(buffer: buffer))
+      let content = InputFileParser().content(from: String(buffer: buffer))
 
       switch renderable.source.supportedFileType {
       case .html:
@@ -58,7 +58,7 @@ class Renderer {
           "website": website.leafData,
         ]
 
-        let content = self.contentFor(template: renderable.template, content: inputFile.content)
+        let content = self.contentFor(template: renderable.template, content: content)
         self.inMemory.register(content: content, at: renderable.source.relativePath.string)
         return leafRenderer
           .render(path: renderable.source.relativePath.string, context: context)
@@ -73,7 +73,7 @@ class Renderer {
           "website": website.leafData,
         ]
 
-        self.inMemory.register(content: inputFile.content, at: renderable.source.relativePath.string)
+        self.inMemory.register(content: content, at: renderable.source.relativePath.string)
         return leafRenderer
           .render(path: renderable.source.relativePath.string, context: context)
           .flatMap { renderedBuffer -> EventLoopFuture<Void> in
@@ -84,7 +84,7 @@ class Renderer {
 
       case .md:
         do {
-          let downContent = try Down(markdownString: inputFile.content).toHTML(.unsafe)
+          let downContent = try Down(markdownString: content).toHTML(.unsafe)
           let context = [
             "current": renderable.leafData,
             "website": website.leafData,
