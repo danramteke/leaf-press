@@ -36,9 +36,9 @@ jobs:
         run: swift --version 
 
       - name: Confirm Build
-        run: "${{ BUILD_CMD }}"
+        run: "${{ matrix.BUILD_CMD }}"
       - name: Confirm Build runs
-        run: "$(${{ BUILD_CMD }} --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release"
+        run: "$(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release"
 
       - name: Test
         run: swift test
