@@ -33,7 +33,7 @@ jobs:
         if: startsWith(matrix.os, 'macOS') != true
         run: |
           swift build -Xswiftc -static-executable -c release 
-          $(swift build -Xswiftc -static-executable -c release)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
+          $(swift build -Xswiftc -static-executable -c release --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
 
       - name: Test
         run: swift test
