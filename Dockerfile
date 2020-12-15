@@ -26,9 +26,11 @@ ADD ./Sources ./Sources
 RUN swift build -c release -Xswiftc -static-executable 
 RUN mkdir /output
 RUN cp $(swift build -c release -Xswiftc -static-executable --show-bin-path)/leaf-press /output/leaf-press
+RUN cp -r $(swift build -c release -Xswiftc -static-executable --show-bin-path)/leaf-press_LeafPressKit.resources /output/leaf-press_LeafPressKit.resources
 
 
 FROM node:14 as release
 RUN apt-get update && apt-get -y install rsync 
 COPY --from=release-build /output/leaf-press /usr/local/bin/leaf-press
+COPY --from=release-build /output/leaf-press_LeafPressKit.resources /usr/local/bin/leaf-press_LeafPressKit.resources 
 CMD ["leaf-press", "--help"]

@@ -2,58 +2,61 @@
 
 Static site generator based on Vapor's [Leaf](https://github.com/vapor/leaf-kit.git). Blog-aware and Markdown aware.
 
-
 ## Install
 
-### Mint
-
-```
-mint install danramteke/leaf-press
-leaf-press build
-```
-
-or
-
-```
-mint run danramteke/leaf-press leaf-press build
-```
-
-### Pre-built Binaries
-
-#### Linux 
+### Linux 
 
 Statically linked binary. Known to work on Debian and Ubuntu
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.10/leaf-press-ubuntu-20.04.tgz | tar xzf -
-./leaf-press build
+curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.12/leaf-press-ubuntu-20.04.tgz | tar xzf -C /usr/local/bin -
+leaf-press init
+leaf-press build
 ```
 
-#### macOS Big Sur
+### macOS Big Sur
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.10/leaf-press-macos-11.0.tgz | tar xzf -
-./leaf-press build
+curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.12/leaf-press-macos-11.0.tgz | tar xzf -C /usr/local/bin -
+leaf-press init
+leaf-press build
 ```
 
-#### macOS Catalina
+### macOS Catalina
 
 ```
-curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.10/leaf-press-macos-10.15.tgz | tar xzf -
-./leaf-press build
+curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.12/leaf-press-macos-10.15.tgz | tar xzf -C /usr/local/bin -
+leaf-press init
+leaf-press build
 ```
 
 ### Build from source
 
 ```
 git clone https://github.com/danramteke/leaf-press.git && cd leaf-press
+swift run leaf-press init 
 swift run leaf-press build 
 ```
 
 ### Docker
 
 ```
-docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.10 leaf-press build
+docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.12 leaf-press build
+```
+
+### Mint
+
+```
+mint install danramteke/leaf-press
+leaf-press init # currently having an issue with resources in Mint
+leaf-press build
+```
+
+or
+
+```
+mint run danramteke/leaf-press leaf-press init
+mint run danramteke/leaf-press leaf-press build
 ```
 
 ## Getting Started

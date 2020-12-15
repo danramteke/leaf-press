@@ -32,7 +32,7 @@ final class InitCommand: Command {
         context.console.output("Created".consoleText(.success))
       }
       for path in paths {
-        context.console.output("\(path)".consoleText(.info))
+        context.console.output("\(path)".consoleText(.plain))
       }
     case .failure(let error):
       context.console.output("\(error)".consoleText(.error))

@@ -31,10 +31,13 @@ jobs:
         include:
           - os: macos-11.0
             BUILD_CMD: swift build -c release
+            RESOURCES: '*.bundle'
           - os: macos-10.15
             BUILD_CMD: swift build -c release
+            RESOURCES: '*.bundle'
           - os: ubuntu-20.04
             BUILD_CMD: swift build -c release -Xswiftc -static-executable 
+            RESOURCES: '*.resources'
 
     steps:
       - uses: actions/checkout@v2
@@ -50,7 +53,7 @@ jobs:
         run: "${{ matrix.BUILD_CMD }}"
       - 
         name: Package
-        run: tar czf release.tgz -C $(${{ matrix.BUILD_CMD }} --show-bin-path) leaf-press
+        run: tar czf release.tgz -C $(${{ matrix.BUILD_CMD }} --show-bin-path) leaf-press {{ matrix.RESOURCES }}
       - 
         name: Upload  
         uses: actions/upload-release-asset@v1

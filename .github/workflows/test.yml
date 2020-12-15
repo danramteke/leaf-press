@@ -7,11 +7,17 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
+    name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11.0, macos-10.15]
+        include:
+          - os: macos-11.0
+            BUILD_CMD: swift build -c release
+          - os: macos-10.15
+            BUILD_CMD: swift build -c release
+          - os: ubuntu-20.04
+            BUILD_CMD: swift build -c release -Xswiftc -static-executable 
     steps:
       -
         name: Checkout
@@ -29,18 +35,10 @@ jobs:
       - name: Get swift version
         run: swift --version 
 
-      - name: confirm build works release configuration - Ubuntu
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-          swift build -Xswiftc -static-executable -c release 
-          $(swift build -Xswiftc -static-executable -c release --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
-
-      - name: confirm build works release configuration - Mac
-        if: startsWith(matrix.os, 'macOS')
-        run: |
-          swift build -c release
-          $(swift build -c release --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
-
+      - name: Confirm Build
+        run: "${{ BUILD_CMD }}"
+      - name: Confirm Build runs
+        run: "$(${{ BUILD_CMD }} --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release"
 
       - name: Test
         run: swift test
