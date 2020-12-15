@@ -1,4 +1,4 @@
-# leaf-press and LeafPressKit
+# LeafPress
 
 Static site generator based on Vapor's [Leaf](https://github.com/vapor/leaf-kit.git). Blog-aware and Markdown aware.
 
@@ -53,7 +53,7 @@ swift run leaf-press build
 ### Docker
 
 ```
-docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.10 build
+docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.10 leaf-press build
 ```
 
 ## Getting Started

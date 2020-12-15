@@ -19,6 +19,9 @@ CMD swift test
 
 
 FROM packages as release-build
+RUN mkdir -p Tests/LeafPressKitUnitTests && touch Tests/LeafPressKitUnitTests/empty.swift \
+    && mkdir -p Tests/LeafPressKitIntegrationTests && touch Tests/LeafPressKitIntegrationTests/empty.swift \
+    && touch Tests/LinuxMain.swift
 ADD ./Sources ./Sources
 RUN swift build -c release -Xswiftc -static-executable 
 RUN mkdir /output
@@ -27,6 +30,5 @@ RUN cp $(swift build -c release -Xswiftc -static-executable --show-bin-path)/lea
 
 FROM node:14 as release
 RUN apt-get update && apt-get -y install rsync 
-COPY --from=release-build /output/leaf-press /leaf-press
-ENTRYPOINT ["/leaf-press"]
-CMD ["version"]
+COPY --from=release-build /output/leaf-press /usr/local/bin/leaf-press
+CMD ["leaf-press", "--help"]
