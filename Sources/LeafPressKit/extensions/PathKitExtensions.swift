@@ -1,4 +1,5 @@
 import PathKit
+import NIO
 import Foundation
 
 extension Path {
@@ -22,4 +23,19 @@ extension Path {
 
     return Path(meAbs)
   }
+
+  func makePathAsync(eventLoop: EventLoop) -> EventLoopFuture<Void> {
+    let promise = eventLoop.makePromise(of: Void.self)
+    DispatchQueue.global().async {
+      do {
+      try self.mkpath()
+        promise.succeed(())
+      } catch {
+        promise.fail(error)
+      }
+
+    }
+    return promise.futureResult
+  }
+
 }

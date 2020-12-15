@@ -2,7 +2,6 @@ import Foundation
 import XCTest
 @testable import LeafPressKit
 
-
 class DraftTests: XCTestCase {
   func testNotDraft() throws {
     let string = """
