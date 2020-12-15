@@ -14,7 +14,7 @@ public class InitAction {
         try workDir.mkpath()
       }
 
-      let resourcePath = Path(Bundle.module.resourcePath!) + Path("scaffold")
+      let resourcePath = Path(Bundle.module.bundlePath) + Path("scaffold")
       let children = try resourcePath.recursiveChildren()
       return try children.map { path in
         let relativePath = path.relative(to: resourcePath)

@@ -31,10 +31,15 @@ jobs:
 
       - name: confirm build in release configuration
         if: startsWith(matrix.os, 'macOS') != true
-        run: swift build -Xswiftc -static-executable -c release 
+        run: |
+          swift build -Xswiftc -static-executable -c release 
+          $(swift build -Xswiftc -static-executable -c release)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
 
       - name: Test
         run: swift test
+
+      - name: Test Init
+        run: swift run leaf-press init -w /tmp/TestOutput/leaf-press-init
 
       - name: Test Artifacts Upload
         uses: actions/upload-artifact@v2
