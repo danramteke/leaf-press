@@ -15,6 +15,7 @@ ADD ./Tests ./Tests
 RUN swift build
 
 FROM debug-build as test
+RUN apt-get update && apt-get -y install rsync 
 CMD swift test
 
 
