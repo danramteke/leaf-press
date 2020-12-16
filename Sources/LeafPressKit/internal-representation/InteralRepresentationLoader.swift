@@ -49,9 +49,15 @@ class InternalRepresentationLoader {
   }
 
   private func loadRenderablesAt<T: Renderable & InputFileInitable>(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[Result<T, Error>]> {
-    self.discoverFileTree(root: root, on: eventLoopGroup.next()).flatMap { tree in
-      return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup)
+    return root.existsAsync(eventLoop: eventLoopGroup.next()).flatMap { (exists) in
+      guard exists else {
+        return eventLoopGroup.next().makeSucceededFuture([])
+      }
+      return self.discoverFileTree(root: root, on: eventLoopGroup.next()).flatMap { tree in
+        return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup)
+      }
     }
+
   }
 
   private func discoverFileTree(root: Path, on eventLoop: EventLoop) -> EventLoopFuture<FileTree> {
