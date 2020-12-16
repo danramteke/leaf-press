@@ -10,7 +10,7 @@ Statically linked binary. Known to work on Debian and Ubuntu
 
 ```
 cd /usr/local/bin \
-&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.15/leaf-press-ubuntu-20.04.tgz | tar xzf - \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.20/leaf-press-ubuntu-20.04.tgz | tar xzf - \
 && cd -
 
 leaf-press init
@@ -21,7 +21,7 @@ leaf-press build
 
 ```
 cd /usr/local/bin \
-&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.15/leaf-press-macos-11.0.tgz | tar xzf - \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.20/leaf-press-macos-11.0.tgz | tar xzf - \
 && cd -
 
 leaf-press init
@@ -32,7 +32,7 @@ leaf-press build
 
 ```
 cd /usr/local/bin \
-&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.15/leaf-press-macos-10.15.tgz | tar xzf -
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.20/leaf-press-macos-10.15.tgz | tar xzf -
 && cd -
 
 leaf-press init
@@ -52,7 +52,7 @@ swift run leaf-press build
 ### Docker
 
 ```
-docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.15 leaf-press build
+docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.20 leaf-press build
 ```
 
 ### Mint
@@ -98,13 +98,15 @@ Configuration is stored in `leaf-press.yml`.
 
 ## Example Projects
 
+Sample projects don't always stay up to date. Here are some projects live examples for reference
+
 ### GitLab Pages: 
 
 - Daniel Delicious: [GitLab Repo](https://gitlab.com/daniel-delicious/daniel-delicious.gitlab.io) [Website](https://daniel-delicious.gitlab.io)
 
 ### GitHub Pages:
 
-None yet
+- DanRamteke.com: [GitHub Repo](https://gitlab.com/danramteke/danramteke.github.io) [Website](https://danramteke.com)
 
 ## Development Setup
 
