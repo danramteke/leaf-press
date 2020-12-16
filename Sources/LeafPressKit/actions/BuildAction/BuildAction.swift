@@ -7,30 +7,29 @@ public class BuildAction {
     self.config = config
   }
 
-  private func thing(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
+  public func build(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
+    return CreateDirectoriesAction(config: config).start()
+      .flatMap { _ in
+        return self.copyFiles(skipStatic: skipStatic)
+          .flatMap { errors in
+            self.renderWebsite(includeDrafts: includeDrafts).flatMap { (errors2) -> Result<[Error], Error> in
+              return .success(errors + errors2)
+            }
+          }.flatMap { (errors3) -> Result<[Error], Error> in
+            self.runPostBuild(skipScript: skipScript).flatMap { (_) -> Result<[Error], Error> in
+              return .success(errors3)
+            }
+          }
+      }
+  }
+
+  private func copyFiles(skipStatic: Bool) -> Result<[Error], Error>  {
     return Result {
       return try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
         return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir)
           .start(skipStatic: skipStatic, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
-
       }
     }
-    .flatMap { errors in
-      self.renderWebsite(includeDrafts: includeDrafts).flatMap { (errors2) -> Result<[Error], Error> in
-        return .success(errors + errors2)
-      }
-    }.flatMap { (errors3) -> Result<[Error], Error> in
-      self.runPostBuild(skipScript: skipScript).flatMap { (_) -> Result<[Error], Error> in
-        return .success(errors3)
-      }
-    }
-  }
-
-  public func build(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
-    return CreateDirectoriesAction(config: config).start().flatMap { _ in
-      return self.thing(skipStatic: skipStatic, skipScript: skipScript, includeDrafts: includeDrafts)
-    }
-
   }
 
   private func runPostBuild(skipScript: Bool) -> Result<Void, Error> {
@@ -41,13 +40,8 @@ public class BuildAction {
       return .success(())
     }
 
-      print("running post build script")
-      return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
-  }
-
-  private func runPostBuild(script: String) -> Result<Void, Error> {
-      print("running post build script")
-      return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
+    print("running post build script")
+    return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
   }
 
   private func renderWebsite(includeDrafts: Bool) -> Result<[Error], Error> {
@@ -56,9 +50,10 @@ public class BuildAction {
         return InternalRepresentationLoader(config: config, includeDrafts: includeDrafts)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .flatMap { website, errors in
-            return Renderer(config: self.config).render(website: website, in: threadPool, on: eventLoopGroup.next()).map { _ in
-              return errors
-            }
+            return Renderer(config: self.config)
+              .render(website: website, in: threadPool, on: eventLoopGroup.next()).map { _ in
+                return errors
+              }
           }
       }
     }
