@@ -7,7 +7,7 @@ public class Website {
   public let categories: Dictionary<String, [Page]>
 
   public init(pages: [Page], posts: [Post]) {
-    self.pages = pages
+    self.pages = pages.sorted()
     self.posts = posts.sorted()
     self.categories = Dictionary(grouping: pages.filter { $0.category != nil }, by: { $0.category! })
   }

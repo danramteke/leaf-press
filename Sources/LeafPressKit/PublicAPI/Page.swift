@@ -2,7 +2,10 @@ import Foundation
 import PathKit
 import LeafKit
 
-public struct Page: Renderable {
+public struct Page: Renderable, Comparable, Equatable {
+  public static func < (lhs: Page, rhs: Page) -> Bool {
+    lhs.title < rhs.title
+  }
   public let template: String
   public let slug: String
   public let title: String
