@@ -35,12 +35,18 @@ public struct CopyStaticFilesAction {
       .flatMap { (sourcePaths) -> EventLoopFuture<[Error]> in
         let futures: [EventLoopFuture<Void>] = sourcePaths
           .map { sourcePath -> EventLoopFuture<Void> in
-            let relativePath = sourcePath.relative(to: sourceRoot)
-            let targetPath = targetRoot + relativePath
-            return self.copyAsync(sourcePath: sourcePath,
-                                  targetPath: targetPath,
-                                  on: eventLoopGroup,
-                                  threadPool: threadPool)
+            sourcePath.isDirectoryAsync(eventLoop: eventLoopGroup.next()).flatMap { (isDirectory) -> EventLoopFuture<Void> in
+              if isDirectory {
+                return eventLoopGroup.next().makeSucceededFuture(())
+              } else {
+                let relativePath = sourcePath.relative(to: sourceRoot)
+                let targetPath = targetRoot + relativePath
+                return self.copyAsync(sourcePath: sourcePath,
+                                      targetPath: targetPath,
+                                      on: eventLoopGroup,
+                                      threadPool: threadPool)
+              }
+            }
           }
 
         let multiWait: EventLoopFuture<[Result<Void, Error>]> = EventLoopFuture.whenAllComplete(futures, on: eventLoopGroup.next())
