@@ -37,12 +37,10 @@ public struct CopyStaticFilesAction {
           .map { sourcePath -> EventLoopFuture<Void> in
             let relativePath = sourcePath.relative(to: sourceRoot)
             let targetPath = targetRoot + relativePath
-
-            
-
-            //          sourceLocation.
-
-            return self.copyAsync(sourcePath: sourcePath, targetPath: targetPath, on: eventLoopGroup, threadPool: threadPool)
+            return self.copyAsync(sourcePath: sourcePath,
+                                  targetPath: targetPath,
+                                  on: eventLoopGroup,
+                                  threadPool: threadPool)
           }
 
         let multiWait: EventLoopFuture<[Result<Void, Error>]> = EventLoopFuture.whenAllComplete(futures, on: eventLoopGroup.next())
@@ -53,21 +51,11 @@ public struct CopyStaticFilesAction {
               return error
             case .success(_):
                   return nil
-
             }
           }
         }
       }
 
   }
-
-//  public struct Error: Swift.Error, LocalizedError {
-//    public let terminationStatus: Int32
-//    let stdErrData: Data
-//
-//    public var errorDescription: String? {
-//      "CopyStaticFilesError \(terminationStatus): " + (String(data: stdErrData, encoding: .utf8) ?? "")
-//    }
-//  }
 }
 

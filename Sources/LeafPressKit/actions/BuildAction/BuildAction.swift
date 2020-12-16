@@ -12,13 +12,15 @@ public class BuildAction {
       .flatMap { _ in
         return self.copyFiles(skipStatic: skipStatic)
           .flatMap { errors in
-            self.renderWebsite(includeDrafts: includeDrafts).flatMap { (errors2) -> Result<[Error], Error> in
-              return .success(errors + errors2)
-            }
+            self.renderWebsite(includeDrafts: includeDrafts)
+              .flatMap { (errors2) -> Result<[Error], Error> in
+                return .success(errors + errors2)
+              }
           }.flatMap { (errors3) -> Result<[Error], Error> in
-            self.runPostBuild(skipScript: skipScript).flatMap { (_) -> Result<[Error], Error> in
-              return .success(errors3)
-            }
+            self.runPostBuild(skipScript: skipScript)
+              .flatMap { (_) -> Result<[Error], Error> in
+                return .success(errors3)
+              }
           }
       }
   }
