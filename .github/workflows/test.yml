@@ -32,15 +32,15 @@ jobs:
       - name: Confirm Build runs
         run: |
           $(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
-          $(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press build -w /tmp/TestOutput/leaf-press-init-release
+          $(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press build -w /tmp/TestOutput/leaf-press-init-release/leaf-press.yml
 
       - name: Test
         run: swift test
 
       - name: Test Init
         run: |
-          swift run leaf-press init -w /tmp/TestOutput/leaf-press-init
-          swift run leaf-press build -w /tmp/TestOutput/leaf-press-init
+          swift run leaf-press init -w /tmp/TestOutput/leaf-press-init-debug
+          swift run leaf-press build -w /tmp/TestOutput/leaf-press-init-debug/leaf-press.yml
 
       - name: Test Artifacts Upload
         uses: actions/upload-artifact@v2
