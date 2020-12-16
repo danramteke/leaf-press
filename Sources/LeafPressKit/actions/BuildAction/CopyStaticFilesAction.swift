@@ -60,7 +60,7 @@ public struct CopyStaticFilesAction {
     let stdErrData: Data
 
     public var errorDescription: String? {
-      "\(terminationStatus): " + (String(data: stdErrData, encoding: .utf8) ?? "")
+      "CopyStaticFilesError \(terminationStatus): " + (String(data: stdErrData, encoding: .utf8) ?? "")
     }
   }
 }

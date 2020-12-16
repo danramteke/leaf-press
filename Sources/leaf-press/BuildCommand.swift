@@ -43,7 +43,7 @@ final class BuildCommand: Command {
     let result = BuildAction(config: config).build(skipStatic: signature.skipStatic,  skipScript: signature.skipScript, includeDrafts: signature.includeDrafts)
     switch result {
     case .failure(let error):
-      context.console.output("\(error)".consoleText(.error))
+      context.console.output("\(error.localizedDescription)".consoleText(.error))
     case .success(let errors):
       context.console.output("Done".consoleText(.success))
       if !errors.isEmpty {
