@@ -30,13 +30,17 @@ jobs:
       - name: Confirm Build
         run: "${{ matrix.BUILD_CMD }}"
       - name: Confirm Build runs
-        run: "$(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release"
+        run: |
+          $(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press init -w /tmp/TestOutput/leaf-press-init-release
+          $(${{ matrix.BUILD_CMD }} --show-bin-path)/leaf-press build -w /tmp/TestOutput/leaf-press-init-release
 
       - name: Test
         run: swift test
 
       - name: Test Init
-        run: swift run leaf-press init -w /tmp/TestOutput/leaf-press-init
+        run: |
+          swift run leaf-press init -w /tmp/TestOutput/leaf-press-init
+          swift run leaf-press build -w /tmp/TestOutput/leaf-press-init
 
       - name: Test Artifacts Upload
         uses: actions/upload-artifact@v2
