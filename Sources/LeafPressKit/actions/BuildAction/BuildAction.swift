@@ -8,34 +8,42 @@ public class BuildAction {
   }
 
   public func build(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
-    Result<[Error], Error>.success([])
-      .map { _ in
-        CreateDirectoriesAction(config: config).start()
-      }
-      .flatMap { _ -> Result<Void, Error> in
-        if skipStatic {
-          return Result<Void, Error>.success(())
-        } else {
-          return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
-        }
-      }
+    return CreateDirectoriesAction(config: config).start()
       .flatMap { _ in
-        self.renderWebsite(includeDrafts: includeDrafts)
-      }
-      .flatMap { errors in
-        guard !skipScript, let script = config.postBuildScript else {
-          return .success([])
-        }
-
-        return self.runPostBuild(script: script).map { _  in
-          return errors
-        }
+        return self.copyFiles(skipStatic: skipStatic)
+          .flatMap { errors in
+            self.renderWebsite(includeDrafts: includeDrafts)
+              .flatMap { (errors2) -> Result<[Error], Error> in
+                return .success(errors + errors2)
+              }
+          }.flatMap { (errors3) -> Result<[Error], Error> in
+            self.runPostBuild(skipScript: skipScript)
+              .flatMap { (_) -> Result<[Error], Error> in
+                return .success(errors3)
+              }
+          }
       }
   }
 
-  private func runPostBuild(script: String) -> Result<Void, Error> {
-      print("running post build script")
-      return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
+  private func copyFiles(skipStatic: Bool) -> Result<[Error], Error>  {
+    return Result {
+      return try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
+        return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir)
+          .start(skipStatic: skipStatic, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+      }
+    }
+  }
+
+  private func runPostBuild(skipScript: Bool) -> Result<Void, Error> {
+    if skipScript {
+      return .success(())
+    }
+    guard let script = self.config.postBuildScript else {
+      return .success(())
+    }
+
+    print("running post build script")
+    return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
   }
 
   private func renderWebsite(includeDrafts: Bool) -> Result<[Error], Error> {
@@ -44,9 +52,10 @@ public class BuildAction {
         return InternalRepresentationLoader(config: config, includeDrafts: includeDrafts)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .flatMap { website, errors in
-            return Renderer(config: self.config).render(website: website, in: threadPool, on: eventLoopGroup.next()).map { _ in
-              return errors
-            }
+            return Renderer(config: self.config)
+              .render(website: website, in: threadPool, on: eventLoopGroup.next()).map { _ in
+                return errors
+              }
           }
       }
     }

@@ -1,5 +1,6 @@
 import Foundation
 import PathKit
+import NIO
 
 public struct CopyStaticFilesAction {
   let source: String
@@ -15,53 +16,46 @@ public struct CopyStaticFilesAction {
     self.target = target.absolute().string
   }
 
-  public func start() -> Result<Void, Swift.Error> {
-    do {
-      let sourcePath = Path(source)
-      if try !sourcePath.exists || sourcePath.children().isEmpty {
 
-        return .success(())
-      }
-    } catch {
-      return .failure(error)
-    }
-
-
-    let process = Process()
-    process.executableURL = URL(string: "file:///usr/bin/env")!
-    process.arguments = ["rsync", "-aq", source, target]
-
-//    let stdOut = Pipe()
-    let stdErr = Pipe()
-
-//    process.standardOutput = stdOut
-    process.standardError = stdErr
-
-    do {
-      try process.run()
-    } catch {
-      return .failure(error)
-    }
-    process.waitUntilExit()
-
-//    let stdOutData = stdOut.fileHandleForReading.readDataToEndOfFile()
-    let stdErrData = stdErr.fileHandleForReading.readDataToEndOfFile()
-
-
-    if process.terminationStatus == 0 {
-      return .success(())
-    } else {
-      return .failure(Error(terminationStatus: process.terminationStatus, stdErrData: stdErrData))
+  private func copyAsync(sourcePath: Path, targetPath: Path, on eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool ) -> EventLoopFuture<Void> {
+    let io = NonBlockingFileIO(threadPool: threadPool)
+    return sourcePath.read(with: io, on: eventLoopGroup.next()).flatMap { buffer in
+      targetPath.write(buffer: buffer, with: io, on: eventLoopGroup.next())
     }
   }
 
-  public struct Error: Swift.Error, LocalizedError {
-    public let terminationStatus: Int32
-    let stdErrData: Data
-
-    public var errorDescription: String? {
-      "CopyStaticFilesError \(terminationStatus): " + (String(data: stdErrData, encoding: .utf8) ?? "")
+  public func start(skipStatic: Bool, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[Error]> {
+    if skipStatic {
+      return eventLoopGroup.next().makeSucceededFuture([])
     }
+    let sourceRoot = Path(source)
+    let targetRoot = Path(target)
+    return sourceRoot
+      .recursiveChildrenAsync(eventLoop: eventLoopGroup.next())
+      .flatMap { (sourcePaths) -> EventLoopFuture<[Error]> in
+        let futures: [EventLoopFuture<Void>] = sourcePaths
+          .map { sourcePath -> EventLoopFuture<Void> in
+            let relativePath = sourcePath.relative(to: sourceRoot)
+            let targetPath = targetRoot + relativePath
+            return self.copyAsync(sourcePath: sourcePath,
+                                  targetPath: targetPath,
+                                  on: eventLoopGroup,
+                                  threadPool: threadPool)
+          }
+
+        let multiWait: EventLoopFuture<[Result<Void, Error>]> = EventLoopFuture.whenAllComplete(futures, on: eventLoopGroup.next())
+        return multiWait.map { (a: [Result<Void, Error>]) -> [Error] in
+          a.compactMap { (c: Result<Void, Error>) -> Error? in
+            switch c {
+            case .failure(let error):
+              return error
+            case .success(_):
+                  return nil
+            }
+          }
+        }
+      }
+
   }
 }
 
