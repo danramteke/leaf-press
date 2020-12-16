@@ -16,7 +16,12 @@ public class BuildAction {
         if skipStatic {
           return Result<Void, Error>.success(())
         } else {
-          return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start()
+          return Result {
+            try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
+              return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start(eventLoopGroup: eventLoopGroup)
+            }
+          }
+
         }
       }
       .flatMap { _ in
