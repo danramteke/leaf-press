@@ -23,14 +23,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
 
-      - name: rsync install ubuntu
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get install rsync
-
-      - name: rsync install macos
-        if: startsWith(matrix.os, 'macOS')
-        run: brew install rsync
-
       - uses: fwal/setup-swift@v1
       - name: Get swift version
         run: swift --version 
