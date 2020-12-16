@@ -47,12 +47,17 @@ public struct CopyStaticFilesAction {
         let multiWait: EventLoopFuture<[Result<Result<Void, Error>, Error>]> = EventLoopFuture.whenAllComplete(futures, on: eventLoopGroup.next())
         return multiWait.map { (a: [Result<Result<Void, Error>, Error>]) -> [Error] in
           a.compactMap { (c: Result<Result<Void, Error>, Error>) -> Error? in
-            return nil
-//            c.map { (d: Result<Void, Error>) -> Error? in
-//              d.mapError { (error) -> Error in
-//                error
-//              }
-//            }
+            switch c {
+            case .failure(let error):
+              return error
+            case .success(let inner):
+              switch inner {
+              case .failure(let error):
+                return error
+              case .success:
+                return nil
+              }
+            }
           }
         }
       }
