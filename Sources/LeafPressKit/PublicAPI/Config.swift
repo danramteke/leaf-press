@@ -49,6 +49,13 @@ public struct Config {
     self.postBuildScript = postBuildScript
   }
 
+  public func overridingOutputDir(path: String?) -> Config {
+    guard let path = path else {
+      return self
+    }
+    return Config(workDir: self.workDir, distDir: Path(path), postsPublishPrefix: self.postsPublishPrefix, pagesDir: self.pagesDir, postsDir: self.postsDir, staticFilesDir: self.staticFilesDir, templatesDir: self.templatesDir, publishedDateStyle: self.publishedDateStyle, publishedTimeStyle: self.publishedTimeStyle, postBuildScript: self.postBuildScript)
+  }
+
   public enum DateStyle: String, Codable {
     case short, medium, long, full
 
