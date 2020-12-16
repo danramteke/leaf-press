@@ -3,47 +3,13 @@ import LeafKit
 import Yams
 
 class InputFileParser {
-  private let pattern: String = #"---\n(.+)---\n(.+)$"#
-  lazy var regex = try! NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
-  func content(from string: String) -> String {
-
-    let nsrange = NSRange(string.startIndex..<string.endIndex, in: string)
-
-    guard let matchRange = regex.firstMatch(in: string, options: [], range: nsrange)?.range(at: 2) else {
-      return string
-    }
-
-    guard matchRange.location != NSNotFound else {
-      return string
-    }
-
-    guard let contentRange = Range(matchRange, in: string) else {
-      return string
-    }
-
-    return string[contentRange].string
-  }
 
   func metadata(from string: String) throws -> [String: LeafData] {
-    let nsrange = NSRange(string.startIndex..<string.endIndex, in: string)
-
-    guard let matchRange = regex.firstMatch(in: string, options: [], range: nsrange)?.range(at: 1) else {
+    guard let yamlDocument = self.match(string: string, at: 1) else {
       return [:]
     }
-
-    guard matchRange.location != NSNotFound else {
-      return [:]
-    }
-
-    guard let yamlRange = Range(matchRange, in: string) else {
-      return [:]
-    }
-
-
-    let yamlDocument: String = string[yamlRange].string
 
     do {
-
       guard let node: Node = try Yams.compose(yaml: yamlDocument) else {
         return [:]
       }
@@ -60,8 +26,32 @@ class InputFileParser {
       throw FrontmatterYamlParseError.other(error)
     }
   }
-}
 
+  func content(from string: String) -> String {
+    guard let content = self.match(string: string, at: 2) else {
+      return string
+    }
+    return content
+  }
+
+  let regex = try! NSRegularExpression(pattern: #"---\n(.+)---\n(.+)$"#, options: [.dotMatchesLineSeparators])
+
+  private func match(string: String, at index: Int) -> String? {
+    guard let matchRange = regex.firstMatch(in: string, options: [], range: string.nsrange)?.range(at: index) else {
+      return nil
+    }
+
+    guard matchRange.location != NSNotFound else {
+      return nil
+    }
+
+    guard let contentRange = Range(matchRange, in: string) else {
+      return nil
+    }
+
+    return string[contentRange].string
+  }
+}
 
 enum FrontmatterYamlParseError: Error, LocalizedError {
   case scalar, sequence, other(Error), nonStringNodeKey

@@ -24,6 +24,10 @@ extension String {
 
     return self[range.upperBound...].string
   }
+
+  var nsrange: NSRange {
+    NSRange(self.startIndex..<self.endIndex, in: self)
+  }
 }
 
 extension Substring {
