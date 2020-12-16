@@ -106,7 +106,7 @@ Sample projects don't always stay up to date. Here are some projects live exampl
 
 ### GitHub Pages:
 
-- DanRamteke.com: [GitHub Repo](https://gitlab.com/danramteke/danramteke.github.io) [Website](https://danramteke.com)
+- DanRamteke.com: [GitHub Repo](https://github.com/danramteke/danramteke.github.io) [Website](https://danramteke.com)
 
 ## Development Setup
 
