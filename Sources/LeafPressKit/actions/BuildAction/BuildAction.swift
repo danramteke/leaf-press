@@ -7,35 +7,42 @@ public class BuildAction {
     self.config = config
   }
 
+  private func thing(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
+    return Result {
+      return try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
+        return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir)
+          .start(skipStatic: skipStatic, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+
+      }
+    }
+    .flatMap { errors in
+      self.renderWebsite(includeDrafts: includeDrafts).flatMap { (errors2) -> Result<[Error], Error> in
+        return .success(errors + errors2)
+      }
+    }.flatMap { (errors3) -> Result<[Error], Error> in
+      self.runPostBuild(skipScript: skipScript).flatMap { (_) -> Result<[Error], Error> in
+        return .success(errors3)
+      }
+    }
+  }
+
   public func build(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
-    Result<[Error], Error>.success([])
-      .map { _ in
-        CreateDirectoriesAction(config: config).start()
-      }
-      .flatMap { _ -> Result<Void, Error> in
-        if skipStatic {
-          return Result<Void, Error>.success(())
-        } else {
-          return Result {
-            try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
-              return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir).start(eventLoopGroup: eventLoopGroup)
-            }
-          }
+    return CreateDirectoriesAction(config: config).start().flatMap { _ in
+      return self.thing(skipStatic: skipStatic, skipScript: skipScript, includeDrafts: includeDrafts)
+    }
 
-        }
-      }
-      .flatMap { _ in
-        self.renderWebsite(includeDrafts: includeDrafts)
-      }
-      .flatMap { errors in
-        guard !skipScript, let script = config.postBuildScript else {
-          return .success([])
-        }
+  }
 
-        return self.runPostBuild(script: script).map { _  in
-          return errors
-        }
-      }
+  private func runPostBuild(skipScript: Bool) -> Result<Void, Error> {
+    if skipScript {
+      return .success(())
+    }
+    guard let script = self.config.postBuildScript else {
+      return .success(())
+    }
+
+      print("running post build script")
+      return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
   }
 
   private func runPostBuild(script: String) -> Result<Void, Error> {

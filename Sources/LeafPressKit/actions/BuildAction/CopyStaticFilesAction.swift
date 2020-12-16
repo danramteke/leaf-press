@@ -17,46 +17,43 @@ public struct CopyStaticFilesAction {
   }
 
 
-  private func copyAsync(sourcePath: Path, targetPath: Path, on eventLoop: EventLoop) -> EventLoopFuture<Result<Void, Error>> {
-    //    let relativePath = sourcePath.relative(to: sourceRoot)
-    //          let targetPath = targetRoot + relativePath
-    //    let sourceLocation = FileLocation(path: relativePath, root: sourceRoot)
-    //    let targetLocation = FileLocation(path: relativePath, root: targetRoot)
-    eventLoop.makeSucceededFuture(.success(()))
+  private func copyAsync(sourcePath: Path, targetPath: Path, on eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool ) -> EventLoopFuture<Void> {
+    let io = NonBlockingFileIO(threadPool: threadPool)
+    return sourcePath.read(with: io, on: eventLoopGroup.next()).flatMap { buffer in
+      targetPath.write(buffer: buffer, with: io, on: eventLoopGroup.next())
+    }
   }
 
-  public func start(eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[Error]> {
-
+  public func start(skipStatic: Bool, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[Error]> {
+    if skipStatic {
+      return eventLoopGroup.next().makeSucceededFuture([])
+    }
     let sourceRoot = Path(source)
     let targetRoot = Path(target)
     return sourceRoot
       .recursiveChildrenAsync(eventLoop: eventLoopGroup.next())
       .flatMap { (sourcePaths) -> EventLoopFuture<[Error]> in
-        let futures: [EventLoopFuture<Result<Void, Error>>] = sourcePaths
-          .map { sourcePath -> EventLoopFuture<Result<Void, Error>> in
+        let futures: [EventLoopFuture<Void>] = sourcePaths
+          .map { sourcePath -> EventLoopFuture<Void> in
             let relativePath = sourcePath.relative(to: sourceRoot)
             let targetPath = targetRoot + relativePath
-            let sourceLocation = FileLocation(path: relativePath, root: sourceRoot)
-            let targetLocation = FileLocation(path: relativePath, root: targetRoot)
+
+            
 
             //          sourceLocation.
 
-            return self.copyAsync(sourcePath: sourcePath, targetPath: targetPath, on: eventLoopGroup.next())
+            return self.copyAsync(sourcePath: sourcePath, targetPath: targetPath, on: eventLoopGroup, threadPool: threadPool)
           }
 
-        let multiWait: EventLoopFuture<[Result<Result<Void, Error>, Error>]> = EventLoopFuture.whenAllComplete(futures, on: eventLoopGroup.next())
-        return multiWait.map { (a: [Result<Result<Void, Error>, Error>]) -> [Error] in
-          a.compactMap { (c: Result<Result<Void, Error>, Error>) -> Error? in
+        let multiWait: EventLoopFuture<[Result<Void, Error>]> = EventLoopFuture.whenAllComplete(futures, on: eventLoopGroup.next())
+        return multiWait.map { (a: [Result<Void, Error>]) -> [Error] in
+          a.compactMap { (c: Result<Void, Error>) -> Error? in
             switch c {
             case .failure(let error):
               return error
-            case .success(let inner):
-              switch inner {
-              case .failure(let error):
-                return error
-              case .success:
-                return nil
-              }
+            case .success(_):
+                  return nil
+
             }
           }
         }
