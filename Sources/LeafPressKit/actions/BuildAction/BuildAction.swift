@@ -52,8 +52,10 @@ public class BuildAction {
         return InternalRepresentationLoader(config: config, includeDrafts: includeDrafts)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .flatMap { website, errors in
-            let copyerFuture = StaticFilesCopier(skipStatic: skipStatic).copyStatics(website: website, in: threadPool, on: eventLoopGroup)
-            
+
+            let copyerFuture = StaticFilesCopier(skipStatic: skipStatic)
+              .copyStatics(website: website, in: threadPool, on: eventLoopGroup)
+
             let rendererFuture = Renderer(config: self.config)
               .render(website: website, in: threadPool, on: eventLoopGroup)
 

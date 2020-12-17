@@ -14,24 +14,24 @@ class InternalRepresentationLoader {
 
   func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<(Website, [Error])> {
 
-    let futureMaybePagesTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
-    let futureMaybePostsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+    let futureMaybePagesTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup)
+    let futureMaybePostsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup)
+    let futureMaybeStaticsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.staticFilesDir, eventLoopGroup: eventLoopGroup)
 
     let futurePagesStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePagesTree, copyingToRoot: self.config.distDir, on: eventLoopGroup)
     let futurePostsStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePostsTree, copyingToRoot: self.config.postsPublishDir, on: eventLoopGroup)
+    let futureStaticFiles: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybeStaticsTree, copyingToRoot: self.config.distDir, on: eventLoopGroup)
 
     let futurePages: EventLoopFuture<[Result<Page, Error>]> = self.loadRenderables(from: futureMaybePagesTree, in: threadPool, on: eventLoopGroup)
     let futurePosts: EventLoopFuture<[Result<Post, Error>]> = self.loadRenderables(from: futureMaybePostsTree, in: threadPool, on: eventLoopGroup)
 
-    let staticFutures = futurePagesStatics.and(futurePostsStatics).map { (left, right) -> [StaticFile] in
-      return left + right
+    let futureCombinedStatics: EventLoopFuture<[StaticFile]> = EventLoopFuture<([StaticFile], [StaticFile], [StaticFile])>.multiWait(futurePagesStatics, futurePostsStatics, futureStaticFiles).map { arg0 -> [StaticFile] in
+      return arg0.0 + arg0.1 + arg0.2
     }
 
-    let nonStaticFutures = futurePages.and(futurePosts)
+    return EventLoopFuture<Any>.multiWait(futurePages, futurePosts, futureCombinedStatics).map { (arg0) -> (Website, [Error]) in
+      let (pageResults, postResults, statics) = arg0
 
-    return nonStaticFutures.and(staticFutures).map { (nonStatics, statics) -> (Website, [Error]) in
-      let pageResults = nonStatics.0
-      let postResults = nonStatics.1
       var errors: [Error] = []
       var pages: [Page] = []
       var posts: [Post] = []
@@ -62,7 +62,7 @@ class InternalRepresentationLoader {
     }
   }
 
-  private func discoverFileTreeAt(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<FileTree?> {
+  private func discoverFileTreeAt(root: Path, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<FileTree?> {
     return root.existsAsync(eventLoop: eventLoopGroup.next()).flatMap { exists -> EventLoopFuture<FileTree?> in
       guard exists else {
         return eventLoopGroup.next().makeSucceededFuture(nil)
