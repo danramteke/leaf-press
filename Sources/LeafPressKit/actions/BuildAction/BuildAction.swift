@@ -10,28 +10,16 @@ public class BuildAction {
   public func build(skipStatic: Bool, skipScript: Bool, includeDrafts: Bool) -> Result<[Error], Error> {
     return CreateDirectoriesAction(config: config).start()
       .flatMap { _ in
-        return self.copyFiles(skipStatic: skipStatic)
-          .flatMap { errors in
-            self.renderWebsite(includeDrafts: includeDrafts, skipStatic: skipStatic)
-              .flatMap { (errors2) -> Result<[Error], Error> in
-                return .success(errors + errors2)
-              }
-          }.flatMap { (errors3) -> Result<[Error], Error> in
-            self.runPostBuild(skipScript: skipScript)
-              .flatMap { (_) -> Result<[Error], Error> in
-                return .success(errors3)
-              }
+        self.renderWebsite(includeDrafts: includeDrafts, skipStatic: skipStatic)
+          .flatMap { (errors2) -> Result<[Error], Error> in
+            return .success(errors2)
+          }
+      }.flatMap { (errors3) -> Result<[Error], Error> in
+        self.runPostBuild(skipScript: skipScript)
+          .flatMap { (_) -> Result<[Error], Error> in
+            return .success(errors3)
           }
       }
-  }
-
-  private func copyFiles(skipStatic: Bool) -> Result<[Error], Error>  {
-    return Result {
-      return try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
-        return CopyStaticFilesAction(source: config.staticFilesDir, target: config.distDir)
-          .start(skipStatic: skipStatic, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
-      }
-    }
   }
 
   private func runPostBuild(skipScript: Bool) -> Result<Void, Error> {
