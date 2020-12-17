@@ -56,8 +56,8 @@ public class BuildAction {
             let rendererFuture = Renderer(config: self.config)
               .render(website: website, in: threadPool, on: eventLoopGroup)
 
-            return copyerFuture.and(rendererFuture).map { _ in
-                return errors
+            return copyerFuture.and(rendererFuture).map { (copierErrors, _) in
+                return errors + copierErrors
               }
           }
       }
