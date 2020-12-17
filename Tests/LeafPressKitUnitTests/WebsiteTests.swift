@@ -8,7 +8,7 @@ class WebsiteTests: XCTestCase {
     let page2 = buildTestPage(slug: "page2", category: "greetings")
     let page3 = buildTestPage(slug: "page2", category: "greetings")
 
-    let website = Website(pages: [page1, page2, page3], posts: [])
+    let website = Website(pages: [page1, page2, page3], posts: [], staticFiles: [])
 
     XCTAssertEqual(website.pages.count, 3)
     XCTAssertEqual(website.posts.count, 0)

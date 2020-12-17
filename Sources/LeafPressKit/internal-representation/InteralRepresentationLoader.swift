@@ -14,10 +14,24 @@ class InternalRepresentationLoader {
 
   func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<(Website, [Error])> {
 
-    let futurePages: EventLoopFuture<[Result<Page, Error>]> = loadRenderablesAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
-    let futurePosts: EventLoopFuture<[Result<Post, Error>]> = loadRenderablesAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+    let futureMaybePagesTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
+    let futureMaybePostsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup, threadPool: threadPool)
 
-    return futurePages.and(futurePosts).map { (pageResults, postResults) -> (Website, [Error]) in
+    let futurePagesStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePagesTree, copyingToRoot: self.config.distDir, on: eventLoopGroup)
+    let futurePostsStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePostsTree, copyingToRoot: self.config.postsPublishDir, on: eventLoopGroup)
+
+    let futurePages: EventLoopFuture<[Result<Page, Error>]> = self.loadRenderables(from: futureMaybePagesTree, in: threadPool, on: eventLoopGroup)
+    let futurePosts: EventLoopFuture<[Result<Post, Error>]> = self.loadRenderables(from: futureMaybePostsTree, in: threadPool, on: eventLoopGroup)
+
+    let staticFutures = futurePagesStatics.and(futurePostsStatics).map { (left, right) -> [StaticFile] in
+      return left + right
+    }
+
+    let nonStaticFutures = futurePages.and(futurePosts)
+
+    return nonStaticFutures.and(staticFutures).map { (nonStatics, statics) -> (Website, [Error]) in
+      let pageResults = nonStatics.0
+      let postResults = nonStatics.1
       var errors: [Error] = []
       var pages: [Page] = []
       var posts: [Post] = []
@@ -44,57 +58,74 @@ class InternalRepresentationLoader {
         }
       }
 
-      return (Website(pages: pages, posts: posts), errors)
+      return (Website(pages: pages, posts: posts, staticFiles: statics), errors)
     }
   }
 
-  private func loadRenderablesAt<T: Renderable & InputFileInitable>(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<[Result<T, Error>]> {
-    return root.existsAsync(eventLoop: eventLoopGroup.next()).flatMap { (exists) in
+  private func discoverFileTreeAt(root: Path, eventLoopGroup: EventLoopGroup, threadPool: NIOThreadPool) -> EventLoopFuture<FileTree?> {
+    return root.existsAsync(eventLoop: eventLoopGroup.next()).flatMap { exists -> EventLoopFuture<FileTree?> in
       guard exists else {
+        return eventLoopGroup.next().makeSucceededFuture(nil)
+      }
+      let promise = eventLoopGroup.next().makePromise(of: FileTree.self)
+      DispatchQueue.global().async {
+        do {
+          let fileLocations = try root.recursiveChildren().compactMap { (childPath) -> FileLocation? in
+            guard childPath.isFile else {
+              return nil
+            }
+            return FileLocation(path: childPath.absolute(), root: root)
+          }
+          promise.succeed(FileTree(fileLocations: fileLocations))
+        } catch {
+          promise.fail(error)
+        }
+      }
+      return promise.futureResult.map({ $0 })
+    }
+  }
+
+
+  private func loadRenderables<T: InputFileInitable & Renderable>(from futureMaybeFileTree: EventLoopFuture<FileTree?>, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[Result<T, Error>]> {
+
+    return futureMaybeFileTree.flatMap { maybeFileTree in
+      guard let fileTree = maybeFileTree else {
         return eventLoopGroup.next().makeSucceededFuture([])
       }
-      return self.discoverFileTree(root: root, on: eventLoopGroup.next()).flatMap { tree in
-        return self.loadRenderables(from: tree, in: threadPool, on: eventLoopGroup)
-      }
-    }
 
-  }
-
-  private func discoverFileTree(root: Path, on eventLoop: EventLoop) -> EventLoopFuture<FileTree> {
-    let promise = eventLoop.makePromise(of: FileTree.self)
-    DispatchQueue.global().async {
-      do {
-        let fileLocations = try root.recursiveChildren().compactMap { (childPath) -> FileLocation? in
-          guard childPath.isFile else {
-            return nil
+      let renderFutures: [EventLoopFuture<Result<T, Error>>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoopGroup).map { (inputFileFuture) in
+        inputFileFuture.map { inputFile -> Result<T, Error> in
+          Result {
+            try T.init(config: self.config, inputFile: inputFile)
           }
-          return FileLocation(path: childPath.absolute(), root: root)
         }
-        promise.succeed(FileTree(fileLocations: fileLocations))
-      } catch {
-        promise.fail(error)
       }
+
+      return EventLoopFuture.whenAllComplete(renderFutures, on: eventLoopGroup.next()).map { $0.map { $0.flatMap { $0 } } }
     }
-    return promise.futureResult
   }
 
-  private func loadRenderables<T: InputFileInitable & Renderable>(from fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[Result<T, Error>]> {
 
-    let files: [EventLoopFuture<Result<T, Error>>] = self.load(fileTree: fileTree, in: threadPool, on: eventLoopGroup).map { (inputFileFuture) in
-      inputFileFuture.map { inputFile -> Result<T, Error> in
-        Result {
-          try T.init(config: self.config, inputFile: inputFile)
-        }
+
+  private func discoverStaticFiles(from futureMaybeFileTree: EventLoopFuture<FileTree?>, copyingToRoot: Path, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[StaticFile]> {
+    return futureMaybeFileTree.map { maybeFileTree -> [StaticFile] in
+      guard let fileTree = maybeFileTree else {
+        return []
+      }
+
+      return fileTree.copyable.map { source -> StaticFile in
+
+        let target = FileLocation(root: copyingToRoot.absolute().string, directoryPath: source.directoryPath, filename: source.rawFilename)
+
+        return StaticFile(slug: source.slug, source: source, target: target, relativeUrl: target.relativeURL)
       }
     }
-
-    return EventLoopFuture.whenAllComplete(files, on: eventLoopGroup.next()).map { $0.map { $0.flatMap { $0 } } }
   }
 
   private func load(fileTree: FileTree, in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> [EventLoopFuture<InputFileMetadata>] {
     let io = NonBlockingFileIO(threadPool: threadPool)
 
-    return fileTree.fileLocations
+    return fileTree.renderable
       .map { location -> EventLoopFuture<InputFileMetadata> in
         return location
           .read(with: io, on: eventLoopGroup.next())

@@ -49,6 +49,10 @@ public struct Config {
     self.postBuildScript = postBuildScript
   }
 
+  public var postsPublishDir: Path {
+    self.distDir + self.postsPublishPrefix
+  }
+
   public func overridingOutputDir(path: String?) -> Config {
     guard let path = path else {
       return self
