@@ -82,4 +82,8 @@ public struct FileLocation: Hashable {
   var relativeURL: URL {
     URL(string: "/" + relativePath.string)!
   }
+
+  var dateFromPath: DateFromDirectoryPath? {
+    DateFromDirectoryPath(directoryPath: self.directoryPath)
+  }
 }

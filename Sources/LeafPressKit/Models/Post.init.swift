@@ -7,6 +7,8 @@ extension Post: InputFileInitable {
     let date: Date = try  {
       if let datePrefix = inputFile.source.datePrefix {
         return datePrefix.date
+      } else if let dateFromPath = inputFile.source.dateFromPath {
+        return dateFromPath.date
       } else {
 
         guard let dateString = inputFile.dateString else {

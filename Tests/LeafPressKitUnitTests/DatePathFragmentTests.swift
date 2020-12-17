@@ -4,7 +4,7 @@ import PathKit
 @testable import LeafPressKit
 
 class DatePathFragmentTests: XCTestCase {
-  func testBasic() {
+  func testBasics() {
 
     assertPathFragment(1608017097, "2020/12/15")
     assertPathFragment(1602000097, "2020/10/06")

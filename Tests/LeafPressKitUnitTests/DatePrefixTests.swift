@@ -1,7 +1,7 @@
 import XCTest
 @testable import LeafPressKit
 
-class StringTests: XCTestCase {
+class DatePrefixTests: XCTestCase {
   func testDatePrefix() {
     XCTAssertEqual(DatePrefix(filename: "2020-10-07-sample-file")?.string, "2020-10-07")
     XCTAssertEqual(DatePrefix(filename: "2020-10-07_sample-file")?.string, "2020-10-07")
