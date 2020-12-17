@@ -12,7 +12,7 @@ public class BuildAction {
       .flatMap { _ in
         return self.copyFiles(skipStatic: skipStatic)
           .flatMap { errors in
-            self.renderWebsite(includeDrafts: includeDrafts)
+            self.renderWebsite(includeDrafts: includeDrafts, skipStatic: skipStatic)
               .flatMap { (errors2) -> Result<[Error], Error> in
                 return .success(errors + errors2)
               }
@@ -46,13 +46,14 @@ public class BuildAction {
     return ScriptAction().start(script: script, workingDirectory: self.config.workDir.string)
   }
 
-  private func renderWebsite(includeDrafts: Bool) -> Result<[Error], Error> {
+  private func renderWebsite(includeDrafts: Bool, skipStatic: Bool) -> Result<[Error], Error> {
     return Result {
       try MultiThreadedContext(numberOfThreads: 3).run { (eventLoopGroup, threadPool) in
         return InternalRepresentationLoader(config: config, includeDrafts: includeDrafts)
           .load(threadPool: threadPool, eventLoopGroup: eventLoopGroup)
           .flatMap { website, errors in
-            let copyerFuture = StaticFilesCopier().copyStatics(website: website, in: threadPool, on: eventLoopGroup)
+            let copyerFuture = StaticFilesCopier(skipStatic: skipStatic).copyStatics(website: website, in: threadPool, on: eventLoopGroup)
+            
             let rendererFuture = Renderer(config: self.config)
               .render(website: website, in: threadPool, on: eventLoopGroup)
 
