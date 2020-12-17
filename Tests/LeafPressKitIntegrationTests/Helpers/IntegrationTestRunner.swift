@@ -40,7 +40,7 @@ struct IntegrationTestRunner {
     }
 
 
-    switch RoutesAction(config: config).list(includeDrafts: false) {
+    switch RoutesAction(config: config).list(includeDrafts: false, includeStatic: true) {
     case .failure(let error):
       XCTFail("Failure building. Error: \(error.localizedDescription)")
     case .success(let success):

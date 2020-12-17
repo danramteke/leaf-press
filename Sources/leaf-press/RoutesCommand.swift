@@ -23,7 +23,7 @@ final class RoutesCommand: Command {
       context.console.output("including routes to static files".consoleText(.info))
     }
     
-    let result = RoutesAction(config: signature.loadConfig(using: context)).list(includeDrafts: signature.includeDrafts)
+    let result = RoutesAction(config: signature.loadConfig(using: context)).list(includeDrafts: signature.includeDrafts, includeStatic: signature.includeStatic)
 
     switch result {
     case .success(let success):

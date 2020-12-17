@@ -1,14 +1,8 @@
 import NIO
 
 class StaticFilesCopier {
-  let skipStatic: Bool
-  init(skipStatic: Bool) {
-    self.skipStatic = skipStatic
-  }
+
   func copy(staticFiles: [StaticFile], in threadPool: NIOThreadPool, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[Error]> {
-    if skipStatic {
-      return eventLoopGroup.next().makeSucceededFuture([])
-    }
 
     let io = NonBlockingFileIO(threadPool: threadPool)
 

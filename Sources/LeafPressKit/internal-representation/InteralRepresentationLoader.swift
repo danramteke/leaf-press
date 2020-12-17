@@ -7,9 +7,11 @@ class InternalRepresentationLoader {
 
   let config: Config
   let includeDrafts: Bool
-  init(config: Config, includeDrafts: Bool) {
+  let includeStatic: Bool
+  init(config: Config, includeDrafts: Bool, includeStatic: Bool) {
     self.config = config
     self.includeDrafts = includeDrafts
+    self.includeStatic = includeStatic
   }
 
   func load(threadPool: NIOThreadPool, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<(Website, [Error])> {
@@ -18,9 +20,9 @@ class InternalRepresentationLoader {
     let futureMaybePostsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup)
     let futureMaybeStaticsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.staticFilesDir, eventLoopGroup: eventLoopGroup)
 
-    let futurePagesStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePagesTree, copyingToRoot: self.config.distDir, on: eventLoopGroup)
-    let futurePostsStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePostsTree, copyingToRoot: self.config.postsPublishDir, on: eventLoopGroup)
-    let futureStaticFiles: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybeStaticsTree, copyingToRoot: self.config.distDir, on: eventLoopGroup)
+    let futurePagesStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePagesTree, on: eventLoopGroup)
+    let futurePostsStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePostsTree, prefix: self.config.postsPublishPrefix, on: eventLoopGroup)
+    let futureStaticFiles: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybeStaticsTree, on: eventLoopGroup)
 
     let futurePages: EventLoopFuture<[Result<Page, Error>]> = self.loadRenderables(from: futureMaybePagesTree, in: threadPool, on: eventLoopGroup)
     let futurePosts: EventLoopFuture<[Result<Post, Error>]> = self.loadRenderables(from: futureMaybePostsTree, in: threadPool, on: eventLoopGroup)
@@ -107,15 +109,16 @@ class InternalRepresentationLoader {
 
 
 
-  private func discoverStaticFiles(from futureMaybeFileTree: EventLoopFuture<FileTree?>, copyingToRoot: Path, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[StaticFile]> {
+  private func discoverStaticFiles(from futureMaybeFileTree: EventLoopFuture<FileTree?>, prefix: Path? = nil, on eventLoopGroup: EventLoopGroup) -> EventLoopFuture<[StaticFile]> {
     return futureMaybeFileTree.map { maybeFileTree -> [StaticFile] in
-      guard let fileTree = maybeFileTree else {
+      guard self.includeStatic, let fileTree = maybeFileTree else {
         return []
       }
 
       return fileTree.copyable.map { source -> StaticFile in
 
-        let target = FileLocation(root: copyingToRoot.absolute().string, directoryPath: source.directoryPath, filename: source.rawFilename)
+        let directoryPath: Path = [prefix, Path(source.directoryPath)].compactMap({$0}).reduce(Path(), +)
+        let target = FileLocation(root: self.config.distDir.string, directoryPath: directoryPath.string, filename: source.rawFilename)
 
         return StaticFile(slug: source.slug, source: source, target: target, relativeUrl: target.relativeURL)
       }

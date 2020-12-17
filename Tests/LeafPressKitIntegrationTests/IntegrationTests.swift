@@ -16,6 +16,9 @@ class IntegrationTests: XCTestCase {
       "/posts/2020/11/01/sample-post.html",
       "/posts/2020/08/28/date-prefix.html",
       "/posts/2020/12/06/date-from-path.html",
+      "/styles.css",
+      "/posts/2020/12/06/images/image.png",
+      "/subfolder/text.txt"
     ]
 
     try IntegrationTestRunner().run(fixtureName: fixtureName, expectedRoutes: expectedRoutes)
