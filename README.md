@@ -10,7 +10,7 @@ Statically linked binary. Known to work on Debian and Ubuntu
 
 ```
 cd /usr/local/bin \
-&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.20/leaf-press-ubuntu-20.04.tgz | tar xzf - \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.21/leaf-press-ubuntu-20.04.tgz | tar xzf - \
 && cd -
 
 leaf-press init
@@ -21,7 +21,7 @@ leaf-press build
 
 ```
 cd /usr/local/bin \
-&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.20/leaf-press-macos-11.0.tgz | tar xzf - \
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.21/leaf-press-macos-11.0.tgz | tar xzf - \
 && cd -
 
 leaf-press init
@@ -32,7 +32,7 @@ leaf-press build
 
 ```
 cd /usr/local/bin \
-&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.20/leaf-press-macos-10.15.tgz | tar xzf -
+&& curl -L https://github.com/danramteke/leaf-press/releases/download/0.4.21/leaf-press-macos-10.15.tgz | tar xzf -
 && cd -
 
 leaf-press init
@@ -52,7 +52,7 @@ swift run leaf-press build
 ### Docker
 
 ```
-docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.20 leaf-press build
+docker run -v `pwd`:`pwd` -w `pwd` danramteke/leaf-press:0.4.21 leaf-press build
 ```
 
 ### Mint
@@ -92,13 +92,12 @@ Configuration is stored in `leaf-press.yml`.
 - `postsDir`: path to posts directory, relative to `leaf-press.yml`. Posts need to have a date, and are considered chronological.
 - `staticFilesDir`: path to static files. These are copied into the output directory without any processing. Useful for images, or for other assets that don't need processing.
 - `templatesDir`: path to templates
-
 - `postBuildScript` can be used to run minification or CSS helpers. 
 
 
 ## Example Projects
 
-Sample projects don't always stay up to date. Here are some projects live examples for reference
+Here are some projects live examples for reference, since sample projects don't always stay up to date. 
 
 ### GitLab Pages: 
 
