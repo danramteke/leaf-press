@@ -43,6 +43,10 @@ final class BuildCommand: Command {
       context.console.output("Skipping scripts".consoleText(.info))
     }
 
+    if signature.watch {
+      context.console.output("--watch is not yet implemented".consoleText(.info))
+    }
+
     let result = BuildAction(config: config)
       .build(skipStatic: signature.skipStatic, skipScript: signature.skipScript, includeDrafts: signature.includeDrafts)
     switch result {
