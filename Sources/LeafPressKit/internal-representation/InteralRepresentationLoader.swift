@@ -18,7 +18,7 @@ class InternalRepresentationLoader {
 
     let futureMaybePagesTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.pagesDir, eventLoopGroup: eventLoopGroup)
     let futureMaybePostsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.postsDir, eventLoopGroup: eventLoopGroup)
-    let futureMaybeStaticsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.staticFilesDir, eventLoopGroup: eventLoopGroup)
+    let futureMaybeStaticsTree: EventLoopFuture<FileTree?> = self.discoverFileTreeAt(root: self.config.staticFilesDir, assumeAllStatic: true, eventLoopGroup: eventLoopGroup)
 
     let futurePagesStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePagesTree, on: eventLoopGroup)
     let futurePostsStatics: EventLoopFuture<[StaticFile]> = self.discoverStaticFiles(from: futureMaybePostsTree, prefix: self.config.postsPublishPrefix, on: eventLoopGroup)
@@ -64,7 +64,7 @@ class InternalRepresentationLoader {
     }
   }
 
-  private func discoverFileTreeAt(root: Path, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<FileTree?> {
+  private func discoverFileTreeAt(root: Path, assumeAllStatic: Bool = false, eventLoopGroup: EventLoopGroup) -> EventLoopFuture<FileTree?> {
     return root.existsAsync(eventLoop: eventLoopGroup.next()).flatMap { exists -> EventLoopFuture<FileTree?> in
       guard exists else {
         return eventLoopGroup.next().makeSucceededFuture(nil)
@@ -78,7 +78,13 @@ class InternalRepresentationLoader {
             }
             return FileLocation(path: childPath.absolute(), root: root)
           }
-          promise.succeed(FileTree(fileLocations: fileLocations))
+
+          if assumeAllStatic {
+            promise.succeed(FileTree(renderable: [], copyable: fileLocations))
+          } else {
+            promise.succeed(FileTree(fileLocations: fileLocations))
+          }
+
         } catch {
           promise.fail(error)
         }
