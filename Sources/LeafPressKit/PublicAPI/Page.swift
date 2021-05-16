@@ -18,6 +18,7 @@ public struct Page: Renderable, Comparable, Equatable {
   public let metadata: [String: LeafData]
   public let isIncluded: Bool
   public let category: String?
+  public let date: Date?
 }
 extension Page: LeafDataRepresentable {
   public var leafData: LeafData {

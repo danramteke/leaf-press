@@ -9,6 +9,15 @@ extension Page: InputFileInitable {
       slug: inputFile.source.slug,
       fileExtension: SupportedFileType.html.rawValue)
 
+
+    let metadataDate: Date? = {
+      guard let dateString = inputFile.metadata["date"]?.string else {
+        return nil
+      }
+
+      return config.date(from: dateString)
+    }()
+
     self.init(
       template: inputFile.template ?? "page.leaf",
       slug: inputFile.source.slug,
@@ -19,6 +28,7 @@ extension Page: InputFileInitable {
       relativeUrl: target.relativeURL,
       metadata: inputFile.metadata,
       isIncluded: inputFile.isIncluded,
-      category: inputFile.category)
+      category: inputFile.category,
+      date: metadataDate)
   }
 }

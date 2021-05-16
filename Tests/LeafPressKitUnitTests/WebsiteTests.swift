@@ -17,6 +17,6 @@ class WebsiteTests: XCTestCase {
   }
 
   private func buildTestPage(slug: String, category: String?) -> Page {
-    Page(template: "", slug: slug, title: slug, summary: nil, source: FileLocation(root: "", directoryPath: "", slug: slug, fileExtension: nil), target: FileLocation(root: "", directoryPath: "", slug: slug, fileExtension: nil), relativeUrl: URL(string: slug)!, metadata: [:], isIncluded: true, category: category)
+    Page(template: "", slug: slug, title: slug, summary: nil, source: FileLocation(root: "", directoryPath: "", slug: slug, fileExtension: nil), target: FileLocation(root: "", directoryPath: "", slug: slug, fileExtension: nil), relativeUrl: URL(string: slug)!, metadata: [:], isIncluded: true, category: category, date: nil)
   }
 }
