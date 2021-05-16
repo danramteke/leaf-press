@@ -23,7 +23,7 @@ public struct FileLocation: Hashable {
   init(root: String, directoryPath: String, filename: String) {
 
 
-    if let index = filename.firstIndex(of: ".") {
+    if let index = filename.lastIndex(of: ".") {
       let slug: String = filename[..<index].string
       let fileExtension: String = filename[filename.index(after: index)...].string
 

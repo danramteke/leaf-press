@@ -28,6 +28,18 @@ class FileLocationTests: XCTestCase {
     XCTAssertEqual(fileLocation.supportedFileType, .md)
   }
 
+  func testMultipleDotsPage() {
+    let fileLocation = FileLocation(path: "page.2.md", root: "/private/tmp/pages")
+    XCTAssertNil(fileLocation.datePrefix)
+    XCTAssertEqual(fileLocation.directoryPath, "")
+    XCTAssertEqual(fileLocation.fileExtension, "md")
+    XCTAssertEqual(fileLocation.absolutePath, "/private/tmp/pages/page.2.md")
+    XCTAssertEqual(fileLocation.rawFilename, "page.2.md")
+    XCTAssertEqual(fileLocation.relativePath, "page.2.md")
+    XCTAssertEqual(fileLocation.relativeURL, URL(string:"/page.2.md")!)
+    XCTAssertEqual(fileLocation.supportedFileType, .md)
+  }
+
   func testUnsupported() {
     let fileLocation = FileLocation(path: "unsupported.asdf", root: "/private/tmp/pages")
     XCTAssertNil(fileLocation.datePrefix)
