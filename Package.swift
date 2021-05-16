@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.4
 
 import PackageDescription
 import Foundation
@@ -20,7 +20,7 @@ let package = Package(
     .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
   ],
   targets: [      
-    .target(name: "leaf-press", 
+    .executableTarget(name: "leaf-press", 
             dependencies: [
               "PathKit",
               "Yams",
