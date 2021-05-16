@@ -6,7 +6,7 @@ import Foundation
 let package = Package(
   name: "leaf-press",
   platforms: [
-    .macOS("10.15.4"),
+    .macOS("11.0"),
   ],
   products: [
     .executable(name: "leaf-press", targets: ["leaf-press"]),

@@ -29,12 +29,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-11.0
-            BUILD_CMD: swift build -c release
-            RESOURCES: '*.bundle'
-          - os: macos-10.15
-            BUILD_CMD: swift build -c release
-            RESOURCES: '*.bundle'
+          # - os: macos-11.0
+          #   BUILD_CMD: swift build -c release
+          #   RESOURCES: '*.bundle'
+          # - os: macos-10.15
+          #   BUILD_CMD: swift build -c release
+          #   RESOURCES: '*.bundle'
           - os: ubuntu-20.04
             BUILD_CMD: swift build -c release -Xswiftc -static-executable 
             RESOURCES: '*.resources'
