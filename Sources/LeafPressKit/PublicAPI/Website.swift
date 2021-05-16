@@ -10,7 +10,7 @@ public class Website {
   public init(pages: [Page], posts: [Post], staticFiles: [StaticFile]) {
     self.pages = pages.sorted()
     self.posts = posts.sorted()
-    self.categories = Dictionary(grouping: pages.filter { $0.category != nil }, by: { $0.category! })
+    self.categories = Dictionary(grouping: pages.sorted().reversed().filter { $0.category != nil }, by: { $0.category! })
     self.staticFiles = staticFiles.sorted()
   }
 }
