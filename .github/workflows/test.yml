@@ -40,7 +40,7 @@ jobs:
       - name: Test Init
         run: |
           swift run leaf-press init -w /tmp/TestOutput/leaf-press-init-debug
-          swift run leaf-press build -c /tmp/TestOutput/leaf-press-init-debug/leaf-press.yml
+          swift run leaf-press build --config /tmp/TestOutput/leaf-press-init-debug/leaf-press.yml
 
       - name: Test Artifacts Upload
         uses: actions/upload-artifact@v2
