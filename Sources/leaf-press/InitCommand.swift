@@ -1,7 +1,7 @@
 import Foundation
 import ConsoleKit
 import LeafPressKit
-import PathKit
+import MPath
 
 final class InitCommand: Command {
   struct Signature: CommandSignature {

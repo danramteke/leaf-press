@@ -1,5 +1,5 @@
 import Foundation
-import PathKit
+import MPath
 import NIO
 
 struct FileTree {

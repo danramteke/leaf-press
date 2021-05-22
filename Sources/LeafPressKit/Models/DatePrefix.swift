@@ -1,5 +1,5 @@
 import Foundation
-import PathKit
+import MPath
 
 struct DatePrefix: Hashable, Equatable {
   let string: String

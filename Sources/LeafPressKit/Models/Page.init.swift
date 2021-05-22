@@ -4,7 +4,7 @@ import NIO
 extension Page: InputFileInitable {
   init(config: Config, inputFile: InputFileMetadata) {
     let target = FileLocation(
-      root: config.distDir.string,
+      root: config.distDir,
       directoryPath: inputFile.source.directoryPath,
       slug: inputFile.source.slug,
       fileExtension: SupportedFileType.html.rawValue)

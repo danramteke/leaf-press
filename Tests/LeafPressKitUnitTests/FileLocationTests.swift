@@ -1,7 +1,7 @@
 import Foundation
 @testable import LeafPressKit
 import XCTest
-import PathKit
+import MPath
 
 class FileLocationTests: XCTestCase {
   func testPageInFolder() {

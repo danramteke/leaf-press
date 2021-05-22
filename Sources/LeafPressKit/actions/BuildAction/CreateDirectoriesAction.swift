@@ -1,5 +1,5 @@
 import Foundation
-import PathKit
+import MPath
 
 public struct CreateDirectoriesAction {
   let config: Config
@@ -9,8 +9,8 @@ public struct CreateDirectoriesAction {
 
   public func start() -> Result<Void, Error> {
     return Result {
-      try config.distDir.mkpath()
-      try (config.distDir + config.postsPublishPrefix).mkpath()
+      try config.distDir.createDirectories()
+      try (config.distDir + config.postsPublishPrefix).createDirectories()
     }
   }
 }

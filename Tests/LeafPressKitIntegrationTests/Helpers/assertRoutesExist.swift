@@ -1,6 +1,6 @@
 import XCTest
 import Foundation
-import PathKit
+import MPath
 
 func assertRoutesExist(routes: Set<String>, distDir: Path, file: StaticString = #file, line: UInt = #line) {
   for route in routes {

@@ -1,7 +1,7 @@
 import Foundation
 import ConsoleKit
 import LeafPressKit
-import PathKit
+import MPath
 import Yams
 
 protocol ConfigLoading {
@@ -27,7 +27,7 @@ extension ConfigLoading {
 
     let config: Config = {
       do {
-        let configFileContents: String = try Path(configFilePath).read()
+        let configFileContents: String = try Path(configFilePath).read(encoding: .utf8)
 
         guard !configFileContents.isEmpty else {
           context.console.output("using default config since config at \(configFilePath) was empty".consoleText(.info))

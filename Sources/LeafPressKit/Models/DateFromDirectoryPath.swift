@@ -1,5 +1,5 @@
 import Foundation
-import PathKit
+import MPath
 
 struct DateFromDirectoryPath: Hashable, Equatable {
   let year: Int
@@ -16,6 +16,7 @@ struct DateFromDirectoryPath: Hashable, Equatable {
   }
 
   init?(directoryPath: Path) {
+
     guard directoryPath.components.count > 3 else {
       return nil
     }

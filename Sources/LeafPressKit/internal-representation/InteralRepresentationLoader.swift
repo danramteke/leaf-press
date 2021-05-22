@@ -1,6 +1,6 @@
 import Foundation
 import NIO
-import PathKit
+import MPath
 typealias WebsiteRenderResult = (Website, [Error])
 
 class InternalRepresentationLoader {
@@ -123,8 +123,8 @@ class InternalRepresentationLoader {
 
       return fileTree.copyable.map { source -> StaticFile in
 
-        let directoryPath: Path = [prefix, Path(source.directoryPath)].compactMap({$0}).reduce(Path(), +)
-        let target = FileLocation(root: self.config.distDir.string, directoryPath: directoryPath.string, filename: source.rawFilename)
+        let directoryPath: Path = [prefix, source.directoryPath].compactMap({$0}).reduce(Path(), +)
+        let target = FileLocation(root: self.config.distDir, directoryPath: directoryPath, filename: source.rawFilename)
 
         return StaticFile(slug: source.slug, source: source, target: target, relativeUrl: target.relativeURL)
       }

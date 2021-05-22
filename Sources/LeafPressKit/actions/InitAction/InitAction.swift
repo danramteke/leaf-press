@@ -1,6 +1,6 @@
 import Foundation
 import NIO
-import PathKit
+import MPath
 
 public class InitAction {
   let workDir: Path
@@ -11,7 +11,7 @@ public class InitAction {
   public func scaffold(dryRun: Bool) -> Result<[String], Error> {
     return Result {
       if !dryRun {
-        try workDir.mkpath()
+        try workDir.createDirectories()
       }
 
       let resourcePath = Path(Bundle.module.bundlePath) + Path("scaffold")
@@ -22,9 +22,9 @@ public class InitAction {
         let targetPath = workDir + relativePath
         if !dryRun {
           if path.isDirectory {
-            try targetPath.mkpath()
+            try targetPath.createDirectories()
           } else {
-            try path.copy(targetPath)
+            try path.copy(to: targetPath)
           }
         }
 

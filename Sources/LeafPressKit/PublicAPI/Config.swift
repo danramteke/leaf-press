@@ -1,5 +1,5 @@
 import Foundation
-import PathKit
+import MPath
 
 public struct Config {
   public let workDir: Path

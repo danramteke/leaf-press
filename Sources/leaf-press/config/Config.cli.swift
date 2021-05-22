@@ -1,5 +1,5 @@
 import LeafPressKit
-import PathKit
+import MPath
 
 extension Config {
 

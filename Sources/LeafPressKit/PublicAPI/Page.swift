@@ -1,5 +1,5 @@
 import Foundation
-import PathKit
+import MPath
 import LeafKit
 
 public struct Page: Renderable, Comparable, Equatable {

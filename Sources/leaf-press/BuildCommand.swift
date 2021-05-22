@@ -1,6 +1,6 @@
 import ConsoleKit
 import LeafPressKit
-import PathKit
+import MPath
 import Yams
 import Foundation
 

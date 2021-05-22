@@ -1,6 +1,6 @@
 import Foundation
 import NIO
-import PathKit
+import MPath
 
 extension Path {
   public func read(with io: NonBlockingFileIO, on eventLoop: EventLoop) -> EventLoopFuture<ByteBuffer> {

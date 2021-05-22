@@ -1,7 +1,7 @@
 import Foundation
 import Foundation
 import NIO
-import PathKit
+import MPath
 
 public class NewAction {
   let config: Config
@@ -17,7 +17,7 @@ public class NewAction {
 
     if !dryRun {
       do {
-        try path.write(content.data(using: .utf8)!)
+        try path.write(content, encoding: .utf8)
       } catch {
         return .failure(error)
       }

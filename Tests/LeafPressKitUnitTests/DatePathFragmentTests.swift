@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-import PathKit
+import MPath
 @testable import LeafPressKit
 
 class DatePathFragmentTests: XCTestCase {

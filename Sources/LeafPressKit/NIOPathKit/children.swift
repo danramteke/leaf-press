@@ -1,6 +1,6 @@
 import Foundation
 import NIO
-import PathKit
+import MPath
 
 extension Path {
   public func recursiveChildrenAsync(eventLoop: EventLoop) -> EventLoopFuture<[Path]> {

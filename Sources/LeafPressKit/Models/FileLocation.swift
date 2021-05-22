@@ -1,15 +1,15 @@
 import Foundation
-import PathKit
+import MPath
 
 public struct FileLocation: Hashable {
-  let root: String
-  let directoryPath: String // relative path from root to file
+  let root: Path
+  let directoryPath: Path // relative path from root to file
   let rawFilename: String
   let datePrefix: DatePrefix?
   let slug: String // filename without extensions
   let fileExtension: String?
 
-  init(root: String, directoryPath: String, slug: String, fileExtension: String?) {
+  init(root: Path, directoryPath: Path, slug: String, fileExtension: String?) {
     let rawFilename: String = {
       if let fileExtension = fileExtension {
         return slug + "." + fileExtension
@@ -20,9 +20,7 @@ public struct FileLocation: Hashable {
     self.init(root: root, directoryPath: directoryPath, rawFilename: rawFilename, datePrefix: nil, slug: slug, fileExtension: fileExtension)
   }
 
-  init(root: String, directoryPath: String, filename: String) {
-
-
+  init(root: Path, directoryPath: Path, filename: String) {
     if let index = filename.lastIndex(of: ".") {
       let slug: String = filename[..<index].string
       let fileExtension: String = filename[filename.index(after: index)...].string
@@ -40,7 +38,7 @@ public struct FileLocation: Hashable {
     }
   }
 
-  private init(root: String, directoryPath: String, rawFilename: String, datePrefix: DatePrefix?, slug: String, fileExtension: String?) {
+  private init(root: Path, directoryPath: Path, rawFilename: String, datePrefix: DatePrefix?, slug: String, fileExtension: String?) {
     self.root = root
     self.directoryPath = directoryPath
     self.rawFilename = rawFilename
@@ -50,13 +48,13 @@ public struct FileLocation: Hashable {
   }
 
   init(path: Path, root: Path) {
-    let filename = path.lastComponent
+    let filename = path.components.last ?? ""
 
 
-    let rootString = root.absolute().string
-    let directoryPath = path.relative(to: root).string.removing(suffix: path.lastComponent)!
+    let absoluteRoot = root.absolute()
+    let directoryPath = Path(path.relative(to: root).string.removing(suffix: filename)!)
 
-    self.init(root: rootString, directoryPath: directoryPath, filename: filename)
+    self.init(root: absoluteRoot, directoryPath: directoryPath, filename: filename)
   }
 
   var supportedFileType: SupportedFileType? {
@@ -72,18 +70,14 @@ public struct FileLocation: Hashable {
   }
 
   var absolutePath: Path {
-    Path(root) + Path(directoryPath) + Path(rawFilename)
+    root + directoryPath + Path(rawFilename)
   }
 
   var relativePath: Path {
-    Path(directoryPath) + Path(rawFilename)
+    directoryPath + Path(rawFilename)
   }
 
   var relativeURL: URL {
     URL(string: "/" + relativePath.string)!
-  }
-
-  var dateFromPath: DateFromDirectoryPath? {
-    DateFromDirectoryPath(directoryPath: self.directoryPath)
   }
 }

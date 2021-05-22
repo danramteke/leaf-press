@@ -1,7 +1,7 @@
 import Foundation
 import NIO
 import LeafKit
-import PathKit
+import MPath
 import Down
 
 class Renderer {

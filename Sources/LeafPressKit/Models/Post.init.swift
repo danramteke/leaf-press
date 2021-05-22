@@ -1,12 +1,13 @@
 import NIO
 import Foundation
-import PathKit
+import MPath
 
 extension Post: InputFileInitable {
   init(config: Config, inputFile: InputFileMetadata) throws {
     let date: Date = try {
 
-      if let dateFromPath = inputFile.source.dateFromPath {
+      let relativePath = inputFile.source.absolutePath.relative(to: config.postsDir.absolute())
+      if let dateFromPath = DateFromDirectoryPath(directoryPath: relativePath) {
         return dateFromPath.date
 
       } else if let datePrefix = inputFile.source.datePrefix {
@@ -14,7 +15,7 @@ extension Post: InputFileInitable {
 
       } else {
         guard let dateString = inputFile.dateString else {
-          throw PostInitError(path: inputFile.source.relativeURL.relativeString, message: "doesn't have date. Add a `date` field to the front matter of the post. Frontmatter is YAML at the start of file. A '---' marks the beginning of the YAML and a second '---' marks the end of the YAML.")
+          throw PostInitError(path: inputFile.source.relativeURL.relativeString, message: "doesn't have date. Add a `date` field to the front matter of the post. Frontmatter is YAML at the start of file. A '---' marks the beginning of the frontmatter YAML and a second '---' marks the end of the frontmatter YAML.")
         }
 
         guard let date = config.date(from: dateString.rawValue) else {
@@ -26,8 +27,8 @@ extension Post: InputFileInitable {
 
     let directoryPath: Path = config.postsPublishPrefix + date.pathFragment
     let target = FileLocation(
-      root: config.distDir.string,
-      directoryPath: directoryPath.string,
+      root: config.distDir,
+      directoryPath: directoryPath,
       slug: inputFile.source.slug,
       fileExtension: SupportedFileType.html.rawValue)
 

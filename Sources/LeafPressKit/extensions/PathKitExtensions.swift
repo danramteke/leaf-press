@@ -1,4 +1,4 @@
-import PathKit
+import MPath
 import NIO
 import Foundation
 
@@ -28,7 +28,7 @@ extension Path {
     let promise = eventLoop.makePromise(of: Void.self)
     DispatchQueue.global().async {
       do {
-      try self.mkpath()
+      try self.createDirectories()
         promise.succeed(())
       } catch {
         promise.fail(error)
